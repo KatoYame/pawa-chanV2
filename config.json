@@ -1,0 +1,22 @@
+{	
+	"prefix": "multi", 
+	"namaowner": "KhaelSan",
+	"namabot": "Pawa chan",
+	"defaultSessionName": "khael", 
+	"zeksKey": "KhaelSan21",
+	"LeysKey": "Dappakntlll",
+    "LolKey": "891802afad4a23337606b7df",
+    "DapKey": "DappaGanteng",
+    "XTkey": "MIMINETBOT",
+    "ZeksKey": "fxc7",
+    "BxKey": "Ikyy69",
+	"autoRead": false,
+	"maxLimit": 30,
+	"ownerList": ["6282248192917@s.whatsapp.net", "628114811363@s.whatsapp.net"],
+	"apiUrl": "https://api.zeks.xyz",
+	"xteamUrl": "https://api.xteam.xyz",
+	"dapuhyUrl": "https://dapuhy-api.herokuapp.com",
+	"leysUrl": "https://leyscoders-api.herokuapp.com",
+	"pack": "My Sticker",
+	"author": "wm: KhaeL"
+}
