@@ -19,7 +19,7 @@
 [![Run on Repl.it](https://repl.it/badge/github/justpiple/whatsapp-bot)](https://repl.it/github/justpiple/whatsapp-bot)
 
 
-### Install ⬇️
+### Install 
 
 ```bash
 > git clone https://github.com/justpiple/whatsapp-bot/
