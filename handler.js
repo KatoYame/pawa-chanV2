@@ -288,8 +288,8 @@ module.exports = handle = (client, Client) => {
             mediaBuffer = data.type == 'extendedTextMessage' ? await data.downloadMediaQuotedMessage() : data.type == 'imageMessage' || data.type == 'videoMessage' ? await data.downloadMediaMessage() : null
             var ext = data.isQuotedImage ? 'jpg' : 'mp4'
             list.forEach(async dataC => {
-                if(mediaBuffer) Client.sendFileFromBase64(dataC.jid, mediaBuffer.toString('base64'), `bc.${ext}`, `*PAWA-CHAN BROADCAST*\n\n${data.body} ${dataC.jid.endsWith('@g.us') ?'\n\n_#izin admin grup _*'+dataC.name+'*_' : ''}`)
-                else Client.sendText(dataC.jid, `*「${configs.namabot} Broadcast」*\n\n${data.body}\n\n_#izin admin grup *${dataC.name}*_`)
+                if(mediaBuffer) Client.sendFileFromBase64(dataC.jid, mediaBuffer.toString('base64'), `bc.${ext}`, `*BOT BROADCAST*\n\n${data.body} ${dataC.jid.endsWith('@g.us') ?'\n\n_#izin admin grup _*'+dataC.name+'*_' : ''}`)
+                else Client.sendText(dataC.jid, `*PAWACHAN BROADCAST*\n\n${data.body}`)
             })
         })
         Client.cmd.on('join', async (data) => {
@@ -875,7 +875,7 @@ module.exports = handle = (client, Client) => {
                     Client.sendFileFromUrl(from, image, 'p.jpg', '```MALE```', message)
                     Client.sendFileFromUrl(from, image2, 'p.jpg', '```FEMALE```', message)
                     break
-					} catch (e) {
+					} catch {
                         data.reply(mess.error2)
                     }
 					case 'ppcouple2':
@@ -887,7 +887,7 @@ module.exports = handle = (client, Client) => {
                     image2 = res.data.result.wanita
                     Client.sendFileFromUrl(from, image, 'p.jpg', '```MALE```', message)
                     Client.sendFileFromUrl(from, image2, 'p.jpg', '```FEMALE```', message)
-                    } catch (e) {
+                    } catch {
                         data.reply(mess.error2)
                     }
                     break
