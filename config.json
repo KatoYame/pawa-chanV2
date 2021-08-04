@@ -11,7 +11,7 @@
     "XTkey": "MIMINETBOT",
     "BxKey": "Ikyy69",
 	"autoRead": false,
-	"maxLimit": 25,
+	"maxLimit": 20,
 	"ownerList": ["6282248192917@s.whatsapp.net", "628114811363@s.whatsapp.net"],
 	"apiUrl": "https://api.zeks.xyz",
 	"lolUrl": "https://api.lolhuman.xyz",
