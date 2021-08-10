@@ -10,7 +10,6 @@ const afkJs = require('./lib/afk')
 const moment = require('moment-timezone');
 const { mess, menu, ingfo, donate, hargaprem } = require('./lib/text')
 const { color, getBuffer, convertMp3 } = require('./lib/func')
-const fetchJson = require ('./lib/fetcher.js')
 
 
 moment.tz.setDefault('Asia/Jayapura').locale('id');
