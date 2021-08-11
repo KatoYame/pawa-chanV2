@@ -9,6 +9,7 @@
   "dependencies": {
     "@adiwajshing/baileys": "^3.5.1",
     "axios": "^0.21.1",
+    "chalk": "^4.1.2",
     "child_process": "^1.0.2",
     "express": "^4.17.1",
     "file-type": "^16.5.0",
@@ -16,7 +17,7 @@
     "mime-types": "^2.1.31",
     "moment-timezone": "^0.5.33",
     "node-cron": "^3.0.0",
-    "node-fetch"
+    "node-fetch": "^2.6.0",
     "qrcode": "^1.4.4",
     "socket.io": "^4.1.2",
     "spinnies": "^0.5.1",
