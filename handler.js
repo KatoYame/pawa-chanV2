@@ -16,6 +16,36 @@ moment.tz.setDefault('Asia/Jayapura').locale('id');
 module.exports = handle = (client, Client) => {
     try {
         /*DOWNLOADER*/
+        Client.cmd.on('zippyshare', async (data) => {
+            try {
+                if(isLimit(data.sender)) return data.reply(mess.limit)
+                if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}zippyshare [ link ]*\nContoh : ${data.prefix}zippyshare https://api.lolhuman.xyz/zippy_dl?url=https://www51.zippyshare.com/d/5W0TOBz1/27976/Anime.zip`)
+                data.reply(mess.wait) //https://api.lolhuman.xyz/api/mediafire?apikey=APIKEY&url=https://www.mediafire.com/file/1xgaov026oc44n0/photo_2021-02-05_10-13-39.jpg/file
+                res = await axios.get(`${configs.lolUrl}/api/mediafire?apikey=${configs.LolKey}&url=${data.body}`)
+                if(res.data.status == false) data.reply(res.data.message)
+                ytm = res.data.result
+                teks = `*Zippyshare Downloader*\n\n*Filename* : ${ytm.name_file}\n*Ukuran* : ${ytm.size}\n*Uploaded* : ${ytm.date_upload}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
+                data.reply(teks)
+                Client.sendFileFromUrl(data.from, `${ytm.download_url}`, `${ytm.name_file}`, mess.succes, data.message)
+            } catch {
+                data.reply(mess.error2)
+            }
+        })
+        Client.cmd.on('mediafire', async (data) => {
+            try {
+                if(isLimit(data.sender)) return data.reply(mess.limit)
+                if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}mediafire [ link ]*\nContoh : ${data.prefix}mediafire https://www.mediafire.com/file/1xgaov026oc44n0/photo_2021-02-05_10-13-39.jpg/file`)
+                data.reply(mess.wait) //https://api.lolhuman.xyz/api/mediafire?apikey=APIKEY&url=https://www.mediafire.com/file/1xgaov026oc44n0/photo_2021-02-05_10-13-39.jpg/file
+                res = await axios.get(`${configs.lolUrl}/api/mediafire?apikey=${configs.LolKey}&url=${data.body}`)
+                if(res.data.status == false) data.reply(res.data.message)
+                ytm = res.data.result
+                teks = `*Mediafire Downloader*\n\n*Filename* : ${ytm.filename}\n*Ukuran* : ${ytm.filesize}\n*Uploaded* : ${ytm.uploaded}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
+                data.reply(teks)
+                Client.sendFileFromUrl(data.from, `${ytm.link}`, `${ytm.filename}`, mess.succes, data.message)
+            } catch {
+                data.reply(mess.error2)
+            }
+        })
         Client.cmd.on('ytmp4', async (data) => {
             try {
                 if(isLimit(data.sender)) return data.reply(mess.limit)
@@ -25,7 +55,7 @@ module.exports = handle = (client, Client) => {
                 if(res.data.status == false) data.reply(res.data.message)
                 ytm = res.data.result
                 teks = `*Data berhasil didapatkan!*\n\n*Judul* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : ${ytm.ext}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
-                if(Number(ytm.size.split(' MB')[0]) >= 50.00) return Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', `*Data Berhasil Didapatkan!*\n\n*Title* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : mp4\n*Link* : ${ytm.link}\n\n_Untuk durasi lebih dari batas disajikan dalam bentuk link_`, data.message)
+                if(Number(ytm.size.split(' MB')[0]) >= 100.00) return Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', `*Data Berhasil Didapatkan!*\n\n*Title* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : mp4\n*Link* : ${ytm.link}\n\n_Untuk durasi lebih dari batas disajikan dalam bentuk link_`, data.message)
                 Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', teks, data.message)
                 Client.sendFileFromUrl(data.from, `${ytm.link}`, `${ytm.title} - Download.mp4`, mess.succes, data.message)
             } catch {
@@ -41,7 +71,7 @@ module.exports = handle = (client, Client) => {
                 if(res.data.status == false) data.reply(res.data.message)
                 ytm = res.data.result
                 teks = `*Data berhasil didapatkan!*\n\n*Judul* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : ${ytm.ext}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
-                if(Number(ytm.size.split(' MB')[0]) >= 50.00) return Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', `*Data Berhasil Didapatkan!*\n\n*Title* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : mp3\n*Link* : ${ytm.link}\n\n_Untuk durasi lebih dari batas disajikan dalam bentuk link_`, data.message)
+                if(Number(ytm.size.split(' MB')[0]) >= 100.00) return Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', `*Data Berhasil Didapatkan!*\n\n*Title* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : mp3\n*Link* : ${ytm.link}\n\n_Untuk durasi lebih dari batas disajikan dalam bentuk link_`, data.message)
                 Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', teks, data.message)
                 Client.sendFileFromUrl(data.from, `${ytm.link}`, `${ytm.title} - Download.mp3`, ``, data.message)
             } catch {
@@ -57,7 +87,7 @@ module.exports = handle = (client, Client) => {
                 if(res.data.status == false) data.reply(res.data.message)
                 ytm = res.data.result
                 teks = `*Data berhasil didapatkan!*\n\n*Judul* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : ${ytm.ext}\n*Source* : ${ytm.source}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
-                if(Number(ytm.size.split(' MB')[0]) >= 50.00) return Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', `*Data Berhasil Didapatkan!*\n\n*Title* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : mp4\n*Source* : ${ytm.source}\n*Link* : ${ytm.link}\n\n_Untuk durasi lebih dari batas disajikan dalam bentuk link_`, data.message)
+                if(Number(ytm.size.split(' MB')[0]) >= 100.00) return Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', `*Data Berhasil Didapatkan!*\n\n*Title* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : mp4\n*Source* : ${ytm.source}\n*Link* : ${ytm.link}\n\n_Untuk durasi lebih dari batas disajikan dalam bentuk link_`, data.message)
                 Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', teks, data.message)
                 Client.sendFileFromUrl(data.from, `${ytm.link}`, 'video.mp4', mess.succes, data.message)
             } catch (e) {
@@ -73,7 +103,7 @@ module.exports = handle = (client, Client) => {
                 if(res.data.status == false) data.reply(res.data.message)
                 ytm = res.data.result
                 teks = `*Data berhasil didapatkan!*\n\n*Judul* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : ${ytm.ext}\n*Source* : ${ytm.source}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
-                if(Number(ytm.size.split(' MB')[0]) >= 50.00) return Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', `*Data Berhasil Didapatkan!*\n\n*Title* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : mp3\n*Source* : ${ytm.source}\n*Link* : ${ytm.link}\n\n_Untuk durasi lebih dari batas disajikan dalam bentuk link_`, data.message)
+                if(Number(ytm.size.split(' MB')[0]) >= 100.00) return Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', `*Data Berhasil Didapatkan!*\n\n*Title* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : mp3\n*Source* : ${ytm.source}\n*Link* : ${ytm.link}\n\n_Untuk durasi lebih dari batas disajikan dalam bentuk link_`, data.message)
                 Client.sendFileFromUrl(data.from, ytm.thumb, 'thumb.jpg', teks, data.message)
                 Client.sendFileFromUrl(data.from, ytm.link, `${ytm.title} - Download.mp3`, ``, data.message)
             } catch {
@@ -83,12 +113,18 @@ module.exports = handle = (client, Client) => {
         Client.cmd.on('ig', async (data) => {
             if(isLimit(data.sender)) return data.reply(mess.limit)
             if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}ig [ link ]*\nContoh : ${data.prefix}ig https://www.instagram.com/p/CJ8XKFmJ4al/?igshid=1acpcqo44kgkn`)
-            data.reply(mess.wait) 
-            getresult = await axios.get(`${configs.apiUrl}/api/ig?apikey=${configs.zeksKey}&url=${data.body}`)
-            if(getresult.data.status == false) return data.reply(getresult.data.message)
-            for(let i = 0; i < getresult.data.result.length; i++) {
-                Client.sendFileFromUrl(data.from, getresult.data.result[i].url, `ig.${getresult.data.result[i].type}`, `*「IG DOWNLOADER」*\n\n*Username :* ${getresult.data.owner}\n*Caption :* ${getresult.data.caption}`, data.message);
-            }
+            data.reply(mess.wait)
+        	        axios.get(`${configs.lolUrl}/api/instagram2?apikey=${configs.LolKey}&url=${data.body}`)
+  	              .then(({data}) => {
+     	           let { account, caption, media } = data.result
+					ini_txt = `*「IG DOWNLOADER」*\n`
+					ini_txt += `*Username :* ${account.username}\n`
+					ini_txt += `*Nickname :* ${account.full_name}\n`
+					ini_txt += `*Caption :* ${caption}\n`
+                    for(let i = 0; i < media.length; i++) {
+       	         Client.sendFileFromUrl(data.from, media[i], '', ini_txt, data.message)
+       				}
+ 	               })
         })
         Client.cmd.on('fb', async (data) => {
             if(isLimit(data.sender)) return data.reply(mess.limit)
@@ -1016,7 +1052,6 @@ module.exports = handle = (client, Client) => {
 					case 'nhentaipdf2':
 					case 'nhpdf2':
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(!isPrem(data.sender)) return data.reply(mess.prem)
                         if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ 143756 ]*\nContoh : ${data.prefix}${data.command} 143756`)
                         data.reply(`https://cin.cin.pw/v/${data.body}`)
                         break
