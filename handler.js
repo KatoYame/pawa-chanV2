@@ -16,19 +16,34 @@ moment.tz.setDefault('Asia/Jayapura').locale('id');
 module.exports = handle = (client, Client) => {
     try {
         /*DOWNLOADER*/
+        Client.cmd.on('gdrive', async (data) => {
+            try {
+                if(isLimit(data.sender)) return data.reply(mess.limit)
+                if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}gdrive [ link ]*\nContoh : ${data.prefix}gdrive https://drive.google.com/file/d/1SugE8vjfOyyW3VTRqsxlW_GJh6EKQ19X/view?usp`)
+                data.reply(mess.wait) //https://api.zeks.xyz/api/gdbypass?apikey=apivinz&url=https://drive.google.com/file/d/1SugE8vjfOyyW3VTRqsxlW_GJh6EKQ19X/view?usp
+                res = await axios.get(`${configs.apiUrl}/api/gdbypass?apikey=${configs.zeksKey}&url=${data.body}`)
+                if(res.data.status == false) data.reply(res.data.message)
+                ytm = res.data.data
+                teks = `*Gdrive Downloader*\n\n*Filename* : ${ytm.file_name}\n*Ukuran* : Unknown\n*Link Download* : ${ytm.download_link}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
+                data.reply(teks)
+                Client.sendFileFromUrl(data.from, `${ytm.direct_download}`, `${ytm.file_name}`, mess.succes, data.message)
+            } catch {
+                data.reply(`[]Error, mungkin karena file lebih dari 100MB`)
+            }
+        })
         Client.cmd.on('zippyshare', async (data) => {
             try {
                 if(isLimit(data.sender)) return data.reply(mess.limit)
-                if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}zippyshare [ link ]*\nContoh : ${data.prefix}zippyshare https://api.lolhuman.xyz/zippy_dl?url=https://www51.zippyshare.com/d/5W0TOBz1/27976/Anime.zip`)
-                data.reply(mess.wait) //https://api.lolhuman.xyz/api/mediafire?apikey=APIKEY&url=https://www.mediafire.com/file/1xgaov026oc44n0/photo_2021-02-05_10-13-39.jpg/file
-                res = await axios.get(`${configs.lolUrl}/api/mediafire?apikey=${configs.LolKey}&url=${data.body}`)
+                if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}zippyshare [ link ]*\nContoh : ${data.prefix}zippyshare https://www51.zippyshare.com/v/5W0TOBz1/file.html`)
+                data.reply(mess.wait) //https://api.lolhuman.xyz/api/zippyshare?apikey=&url=https://www51.zippyshare.com/v/5W0TOBz1/file.html
+                res = await axios.get(`${configs.lolUrl}/api/zippyshare?apikey=${configs.LolKey}&url=${data.body}`)
                 if(res.data.status == false) data.reply(res.data.message)
                 ytm = res.data.result
                 teks = `*Zippyshare Downloader*\n\n*Filename* : ${ytm.name_file}\n*Ukuran* : ${ytm.size}\n*Uploaded* : ${ytm.date_upload}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
                 data.reply(teks)
                 Client.sendFileFromUrl(data.from, `${ytm.download_url}`, `${ytm.name_file}`, mess.succes, data.message)
             } catch {
-                data.reply(mess.error2)
+                data.reply(`[]Error, mungkin karena file lebih dari 100MB`)
             }
         })
         Client.cmd.on('mediafire', async (data) => {
@@ -330,8 +345,19 @@ module.exports = handle = (client, Client) => {
             mediaBuffer = data.type == 'extendedTextMessage' ? await data.downloadMediaQuotedMessage() : data.type == 'imageMessage' || data.type == 'videoMessage' ? await data.downloadMediaMessage() : null
             var ext = data.isQuotedImage ? 'jpg' : 'mp4'
             list.forEach(async dataC => {
-                if(mediaBuffer) Client.sendFileFromBase64(dataC.jid, mediaBuffer.toString('base64'), `bc.${ext}`, `*PAWACHAN BROADCAST*\n\n${data.body} `)
-                else Client.sendText(dataC.jid, `*PAWACHAN BROADCAST*\n\n${data.body}`)
+                if(mediaBuffer) Client.sendFileFromBase64(dataC.jid, mediaBuffer.toString('base64'), `bc.${ext}`, `*_BROADCAST PAWACHAN_*\n\n${data.body} ${dataC.jid.endsWith('@g.us') ?'\n\n_#izinAdminGrup _*'+dataC.name+'*_' : ''}`)
+                else Client.sendText(dataC.jid, `*_BROADCAST PAWACHAN_*\n\n${data.body}\n\n_#izinAdminGrup *${dataC.name}*_`)
+            })
+        })
+        Client.cmd.on('bcimg', async (data) => {
+            if(!data.isOwner) return data.reply(mess.ownerOnly)
+            if(data.body == '') return
+            var list = await client.chats.all()
+            mediaBuffer = data.type == 'extendedTextMessage' ? await data.downloadMediaQuotedMessage() : data.type == 'imageMessage' || data.type == 'videoMessage' ? await data.downloadMediaMessage() : null
+            var ext = data.isQuotedImage ? 'jpg' : 'mp4'
+            list.forEach(async dataC => {
+                if(mediaBuffer) Client.sendFileFromBase64(dataC.jid, mediaBuffer.toString('base64'), `.jpg`, `*_BROADCAST PAWACHAN_*\n\n${data.body} ${dataC.jid.endsWith('@g.us') ?'\n\n_#izinAdminGrup _*'+dataC.name+'*_' : ''}`)
+                else Client.sendText(dataC.jid, `*_BROADCAST PAWACHAN_*\n\n${data.body}\n\n_#izinAdminGrup *${dataC.name}*_`)
             })
         })
         Client.cmd.on('join', async (data) => {
@@ -963,7 +989,7 @@ module.exports = handle = (client, Client) => {
 					case 'nekopoi':
                     try {
                         if(isLimit(data.sender)) return data.reply(mess.limit)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${command} [ query ]*\nContoh : ${data.prefix}${command} chainsawman`)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ query ]*\nContoh : ${data.prefix}${data.command} chainsawman`)
                         data.reply(mess.wait) //https://api.lolhuman.xyz/api/nekopoisearch?apikey=APIKEY&query=isekai%20harem
                         res = await axios.get(`${configs.lolUrl}/api/nekopoisearch?apikey=${configs.LolKey}&query=${data.body}`)
                         ttt = res.data.result
@@ -979,8 +1005,8 @@ module.exports = handle = (client, Client) => {
 					case 'doudesu':
                     try {
                         if(isLimit(data.sender)) return data.reply(mess.limit)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${command} [ query ]*\nContoh : ${data.prefix}${command} chainsawman`)
-                        data.reply(mess.wait) //https://api.lolhuman.xyz/api/doujindesu?apikey=EpepBurik&url=https://doujindesu.info/2021/01/18/queen-bee-chapter-33/
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ query ]*\nContoh : ${data.prefix}${data.command} chainsawman`)
+                        data.reply(mess.wait) //https://api.lolhuman.xyz/api/doujindesu?apikey=APIKEYLU&url=https://doujindesu.info/2021/01/18/queen-bee-chapter-33/
                         res = await axios.get(`${configs.lolUrl}/api/nekopoisearch?apikey=${configs.LolKey}&url=${data.body}`)
                         var ttt = res.data.result
                         tekss = `*Title :* ${ttt.title}\n`
@@ -994,7 +1020,7 @@ module.exports = handle = (client, Client) => {
 					case 'nhsearch':
                     try {
                         if(isLimit(data.sender)) return data.reply(mess.limit)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${command} [ query ]*\nContoh : ${data.prefix}${command} chainsawman`)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ query ]*\nContoh : ${data.prefix}${data.command} chainsawman`)
                         data.reply(mess.wait) //https://api.lolhuman.xyz/api/nhentaisearch?apikey=Apikey_Lu&query=gotoubun
                         res = await axios.get(`${configs.lolUrl}/api/nhentaisearch?apikey=${configs.LolKey}&query=${data.body}`)
                         ttt = res.data.result
@@ -1273,7 +1299,7 @@ module.exports = handle = (client, Client) => {
 				    try{
 					if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    res = await axios.get(`https://meme-api.herokuapp.com/gimme/anime${command}`)
+                    res = await axios.get(`https://meme-api.herokuapp.com/gimme/anime${data.command}`)
                     image = res.data.url
                     Client.sendFileFromUrl(from, image, 'p.jpg', mess.sange, message)
                     } catch {
@@ -1331,7 +1357,7 @@ module.exports = handle = (client, Client) => {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     if(!isPrem(data.sender)) return data.reply(mess.prem)
                     data.reply(mess.wait)
-                    Client.sendFileFromUrl(from, `${configs.lolUrl}/api/random2/${command}?apikey=${configs.LolKey}`, 'p.jpg', mess.sange, message)
+                    Client.sendFileFromUrl(from, `${configs.lolUrl}/api/random2/${data.command}?apikey=${configs.LolKey}`, 'p.jpg', mess.sange, message)
                     } catch {
                         data.reply(mess.error)
                     }
@@ -2000,11 +2026,23 @@ module.exports = handle = (client, Client) => {
                     data.reply(res.data.result.string)
                     break
                     /*OTHER*/
+                case 'shortlink':
+                	if(isLimit(data.sender)) return data.reply(mess.limit)
+					if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command}[ link ]*\nContoh : ${data.prefix}${data.command} https://nhentai.net/`)
+					data.reply(mess.wait) //https://api.zeks.xyz/api/urlshort-all?apikey=apivinz&url=https://api.zeks.xyz
+					res = axios.get(`${configs.apiUrl}/api/urlshort-all?apikey?${configs.zeksKey}&url=${data.body}`)
+					if(res.data.status == false) data.reply(res.data.message)
+					ini_txt = `[ Shortlink ]\n`
+					ini_txt += `${res.data.result_1}\n`
+					ini_txt += `${res.data.result_2}\n`
+					ini_txt += `${res.data.result_3}\n`
+					data.reply(ini_txt)
+                break
                 case 'ouo':
                     try {
                         if(isLimit(data.sender)) return data.reply(mess.limit)
                         if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ link ]*\nContoh : ${data.prefix}${data.command} https://ouo.io/8BgQ1w`)
-                        data.reply(mess.wait) //https://api.lolhuman.xyz/api/ouo?apikey=Pee&url=https://ouo.io/8BgQ1w
+                        data.reply(mess.wait) //
                         res = await axios.get(`${configs.lolUrl}/api/ouo?apikey=${configs.LolKey}&url=${data.body}`)
                         te = `*[ ByPass ouo ]*\n\n*Results :* ${res.data.result}`
                         data.reply(te)
