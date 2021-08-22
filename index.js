@@ -25,7 +25,7 @@ global.configs = JSON.parse(fs.readFileSync('./config.json'));
 let dataUser = JSON.parse(fs.readFileSync('./lib/json/dataUser.json'))
 global.vn = JSON.parse(fs.readFileSync('./lib/json/vn.json'))
 global.tebakgambar = {}
-moment.tz.setDefault('Asia/Jayapura').locale('id');
+moment.tz.setDefault('Asia/Jakarta').locale('id');
 const { color } = require('./lib/func')
 const Crypto = require('crypto')
 
@@ -36,145 +36,22 @@ const starts = async (sesName) => {
 		require("./lib/http-server")(client)
         Client.starts()
 		detectChange('./handler.js', (mdl) =>{
+			try{
 			Client.cmd.removeAllListeners()
 			Client.handlerStick.removeAllListeners()
 			require('./handler')(client, Client)
 			console.log(color('[ INFO ]', 'cyan'), `${mdl} auto updated!`)
+			} catch (err) {
+             console.error(err)
+           }
 		})
 		require('./handler')(client, Client)
-		
-		/*antidelete*/
-		
-		client.on('message-update', async (message) => {
-		try {
-	    const from = message.key.remoteJid
-		const messageStubType = WA_MESSAGE_STUB_TYPES[message.messageStubType] || 'MESSAGE'
-		const dataRevoke = JSON.parse(fs.readFileSync('./antidel/gc-revoked.json'))
-		const dataCtRevoke = JSON.parse(fs.readFileSync('./antidel/ct-revoked.json'))
-		const dataBanCtRevoke = JSON.parse(fs.readFileSync('./antidel/ct-revoked-banlist.json'))
-		const sender = message.key.fromMe ? client.user.jid : message.key.remoteJid.endsWith('@g.us') ? message.participant : message.key.remoteJid
-		const isRevoke = message.key.remoteJid.endsWith('@s.whatsapp.net') ? true : message.key.remoteJid.endsWith('@g.us') ? dataRevoke.includes(from) : false
-		const isCtRevoke = message.key.remoteJid.endsWith('@g.us') ? true : dataCtRevoke.data ? true : false
-		const isBanCtRevoke = message.key.remoteJid.endsWith('@g.us') ? true : !dataBanCtRevoke.includes(sender) ? true : false
-		if (messageStubType == 'REVOKE') {
-			console.log(`Stats for grup : ${!isRevoke}\nStats all contact : ${!isCtRevoke}\nStats contacts excluded : ${!isBanCtRevoke}`)
-			if (!isRevoke) return
-			if (!isCtRevoke) return
-			if (!isBanCtRevoke) return
-			const from = message.key.remoteJid
-			const isGroup = message.key.remoteJid.endsWith('@g.us') ? true : false
-			let int
-			let infoMSG = JSON.parse(fs.readFileSync('./antidel/msg.data.json'))
-			const id_deleted = message.key.id
-			const conts = message.key.fromMe ? client.user.jid : client.contacts[sender] || { notify: jid.replace(/@.+/, '') }
-			const pushname = message.key.fromMe ? client.user.name : conts.notify || conts.vname || conts.name || '-'
-			const opt4tag = {
-				contextInfo: { mentionedJid: [sender] }
-			}
-			for (let i = 0; i < infoMSG.length; i++) {
-				if (infoMSG[i].key.id == id_deleted) {
-					const dataInfo = infoMSG[i]
-					const type = Object.keys(infoMSG[i].message)[0]
-					const timestamp = infoMSG[i].messageTimestamp
-					int = {
-						no: i,
-						type: type,
-						timestamp: timestamp,
-						data: dataInfo
-					}
-				}
-			}
-			const index = Number(int.no)
-			const body = int.type == 'conversation' ? infoMSG[index].message.conversation : int.type == 'extendedTextMessage' ? infoMSG[index].message.extendedTextMessage.text : int.type == 'imageMessage' ? infoMSG[index].message.imageMessage.caption : int.type == 'stickerMessage' ? 'Sticker' : int.type == 'audioMessage' ? 'Audio' : int.type == 'videoMessage' ? infoMSG[index].videoMessage.caption : infoMSG[index]
-			const mediaData = int.type === 'extendedTextMessage' ? JSON.parse(JSON.stringify(int.data).replace('quotedM', 'm')).message.extendedTextMessage.contextInfo : int.data
-			var itsme = `0@s.whatsapp.net`
-				var split = `${fake}`
-				var selepbot72 = {
-					contextInfo: {
-						participant: itsme,
-						quotedMessage: {
-							extendedTextMessage: {
-								text: split,
-							}
-						}
-					}
-				}
-			if (int.type == 'conversation' || int.type == 'extendedTextMessage') {
-				const strConversation = `		 **「ANTI-DELETE」**
-
-▣ Nama : ${pushname} 
-▣ Nomer : ${sender.replace('@s.whatsapp.net', '')}
-▣ Tipe : Text
-▣ Waktu : ${moment.unix(int.timestamp).format('HH:mm:ss')}
-▣ Tanggal : ${moment.unix(int.timestamp).format('DD/MM/YYYY')}
-▣ Pesan : ${body ? body : '-'}`
-				reply(from, strConversation, MessageType.text, selepbot72)
-			} else if (int.type == 'stickerMessage') {
-				var itsme = `0@s.whatsapp.net`
-					var split = `${fake}`
-					const pingbro23 = {
-						contextInfo: {
-							participant: itsme,
-							quotedMessage: {
-								extendedTextMessage: {
-									text: split,
-								}
-							}
-						}
-					}
-				const filename = `${sender.replace('@s.whatsapp.net', '')}-${moment().unix()}`
-				const savedFilename = await client.downloadAndSaveMediaMessage(int.data, `./media/sticker/${filename}`)
-				const strConversation = `		 *「ANTI-DELETE」*
-
-▣ Nama : ${pushname} 
-▣ Nomer : ${sender.replace('@s.whatsapp.net', '')}
-▣ Tipe : Sticker
-▣ Waktu : ${moment.unix(int.timestamp).format('HH:mm:ss')}
-▣ Tanggal : ${moment.unix(int.timestamp).format('DD/MM/YYYY')}`
-
-				const buff = fs.readFileSync(savedFilename)
-				Client.reply(strConversation)
-				Client.sendStickerFromUrl(from, buff, pingbro23)
-				fs.unlinkSync(savedFilename)
-
-			} else if (int.type == 'imageMessage') {
-				var itsme = `0@s.whatsapp.net`
-					var split = `${fake}`
-					const pingbro22 = {
-						contextInfo: {
-							participant: itsme,
-							quotedMessage: {
-								extendedTextMessage: {
-									text: split,
-								}
-							}
-						}
-					}
-				const filename = `${sender.replace('@s.whatsapp.net', '')}-${moment().unix()}`
-				const savedFilename = await client.downloadAndSaveMediaMessage(int.data, `./media/revoke/${filename}`)
-				const buff = fs.readFileSync(savedFilename)
-				const strConversation = `	 *「ANTI-DELETE」*
-
-▣ Nama : ${pushname} 
-▣ Nomer : ${sender.replace('@s.whatsapp.net', '')}
-▣ Tipe : Image
-▣ Waktu : ${moment.unix(int.timestamp).format('HH:mm:ss')}
-▣ Tanggal : ${moment.unix(int.timestamp).format('DD/MM/YYYY')}
-▣ Pesan : ${body ? body : '-'}\`\`\``
-				Client.sendFileFromUrl(from, buff, strConversation, message)
-				fs.unlinkSync(savedFilename)
-			}
-		}
-	} catch (e) {
-		console.log('Message : %s', color(e, 'red'))
-	}
-})
 		
         client.on('CB:Presence', asd => {
         	asd = asd[1]
             if (!asd.id.endsWith('@g.us')) return
             if((asd.type == 'composing' || asd.type == 'recording') && afkJs.detectingAfk(asd.id, asd.participant)) {
-            Client.sendText(asd.id, `@${asd.participant.split('@')[0]} sedang mengetik/merekam, Anda berhenti afk`)
+            Client.sendText(asd.id, `@${asd.participant.split('@')[0]} terdeteksi melakukan aktivitas!, status afkMu telah dihapus`)
                 }
         })
 		client.on('CB:Call', json => {
@@ -187,7 +64,7 @@ const starts = async (sesName) => {
 		})
         client.on('new-msg', (message) => {
             if(message.key && message.key.remoteJid == 'status@broadcast') return
-            if(message.key.fromMe && !global.configs.self || !message.key.fromMe && global.configs.self) return
+            if(message.key.fromMe && !Client.self || !message.key.fromMe && Client.self) return
 			let dataGc = JSON.parse(fs.readFileSync('./lib/json/dataGc.json'))
 			const body = message.body
 			const from = message.key.remoteJid
@@ -199,9 +76,16 @@ const starts = async (sesName) => {
 				dataGc[from] = {afk:{}}
 				fs.writeFileSync('./lib/json/dataGc.json', JSON.stringify(dataGc, null, 2))
 			}
-			if (isGroup && dataGc[from].antitagall && !message.isAdmin && (message.mentionedJidList.length == message.groupMembers.length || message.mentionedJidList.length-1 == message.groupMembers.length)){
-                Client.reply(from, '*Tagall detected*\n_Maaf Kamu akan di kick_', message)
+            if (isGroup && dataGc[from].antitagall && !message.isAdmin && (message.mentionedJidList.length == message.groupMembers.length || message.mentionedJidList.length-1 == message.groupMembers.length)){
+                Client.reply(from, 'Tagall detected', message)
                 client.groupRemove(from, [sender]).catch(() => Client.reply(from, `Jadikan bot admin agar bisa menggunakan fitur antitagall`, message))
+            }
+            if (isGroup && dataGc[from].antiviewonce && message.type == 'viewOnceMessage'){
+                var msg = {...message}
+                msg.message = message.message.viewOnceMessage.message
+                msg.message[Object.keys(msg.message)[0]].viewOnce = false
+                Client.reply(from, 'ViewOnce detected!', message)
+                client.forwardMessage(from, msg)
             }
 			if (isGroup && !message.isAdmin && dataGc[from].antilink && /chat\.whatsapp\.com/gi.test(body)){
 				let dtclink = body.match(/chat.whatsapp.com\/(?:invite\/)?([0-9A-Za-z]{18,26})/gi) || []
@@ -209,7 +93,7 @@ const starts = async (sesName) => {
 					checks = await Client.checkInviteLink(l)
 					if(checks.status == 200){
 						Client.reply(from, `Group link detected!`, message)
-						client.groupRemove(from, [sender])
+						client.groupRemove(from, [sender]).catch(() => Client.reply(from, `Jadikan bot admin agar bisa menggunakan fitur antilink`, message))
 					}
 				})
 			}
@@ -218,14 +102,14 @@ const starts = async (sesName) => {
 				fs.writeFileSync('./lib/json/dataUser.json', JSON.stringify(dataUser))
 			}
             if(isGroup) {
-                if(afkJs.detectingAfk(from, sender)) Client.sendText(from, `@${sender.split('@')[0]} kamu berhenti afk.`)
+                if(afkJs.detectingAfk(from, sender)) Client.sendText(from, `@${sender.split('@')[0]} sekarang tidak afk!`)
                 if(message.message.extendedTextMessage && message.message.extendedTextMessage.contextInfo && message.message.extendedTextMessage.contextInfo.mentionedJid) {
                     jids = message.message.extendedTextMessage.contextInfo.mentionedJid
                     jids.forEach(jid => {
                         takeData = afkJs.tagDetect(from, jid)
                         if(!takeData) return
                         duration = moment.duration(moment(takeData.time).diff(moment()))
-                        Client.reply(from, `@${jid.split('@')[0]} sedang afk\nReason: ${takeData.reason}\nTime: ${duration.days()} Hari ${duration.hours()} Jam ${duration.minutes()} Menit ${duration.seconds()} Detik`)
+                        Client.reply(from, `@${jid.split('@')[0]} sedang afk\nReason: ${takeData.reason}\nTime: ${duration.days()} Hari ${duration.hours()} Jam ${duration.minutes()} Menit ${duration.seconds()} detik`)
                     })
                 }
             }
