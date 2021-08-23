@@ -3,14 +3,14 @@
 	"namaowner": "KhaelSan",
 	"namabot": "Pawa chan",
 	"defaultSessionName": "khael", 
-	"zeksKey": "KhaelSan21",
+	"zeksKey": "ShiroNeko",
 	"LeysKey": "dappakntlll",
 	"ChipaKey": "7DVG49XEXTX9CNASCQGX1CXZ",
-    "LolKey": "EpepBurik",
-    "DapKey": "DappaGanteng",
+    "LolKey": "ShiroNeko",
+    "DapKey": "DapKece",
     "XTkey": "MIMINETBOT",
     "BxKey": "Ikyy69",
-	"autoRead": true,
+	"autoRead": false,
 	"self": false, 
 	"maxLimit": 20,
 	"ownerList": ["6282248192917@s.whatsapp.net", "628114811363@s.whatsapp.net"],
@@ -22,6 +22,6 @@
 	"leysUrl": "https://leyscoders-api.herokuapp.com",
 	"chipaUrl": "https://api.chipa.xyz",
 	"janUrl": "https://janbot-api.herokuapp.com",
-	"pack": "My Sticker",
-	"author": "wm: pawa-chan"
+	"pack": " ㅤ",
+	"author": "ㅤ"
 }
