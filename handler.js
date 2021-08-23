@@ -77,6 +77,7 @@ module.exports = handle = (client, Client) => {
                 data.reply(mess.error2)
             }
         })
+        /*
         Client.cmd.on('ytmp3', async (data) => {
             try {
                 if(isLimit(data.sender)) return data.reply(mess.limit)
@@ -93,6 +94,50 @@ module.exports = handle = (client, Client) => {
                 data.reply(mess.error2)
             }
         })
+        */
+        Client.cmd.on('ytmp3', async (data) => {
+        	try {
+                if(isLimit(data.sender)) return data.reply(mess.limit)
+                if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}ytmp3 [ link ]*\nContoh : ${data.prefix}ytmp3 https://www.youtube.com/watch?v=0maWbr0FHKY`)
+                data.reply(mess.wait) //
+                res = await axios.get(`${configs.lolUrl}/api/ytaudio?apikey=${configs.LolKey}&url=${data.body}`)
+                if(res.data.status == false) data.reply(res.data.message)
+                ytm = res.data.result
+                teks = `*YT AUDIO V2*
+
+*Judul* : ${ytm.title}
+*Desk* : ${ytm.description}
+*Uploader* : ${ytm.uploader}
+*Channel* : ${ytm.channel}
+*Duration* : ${ytm.duration}
+*View* : ${ytm.view}
+*Like* : ${ytm.like}
+*Dislike* : ${ytm.dislike}
+*Ukuran* : ${ytm.link.size}
+*Bitrate* : ${ytm.link.bitrate}
+
+_Silahkan tunggu file audio sedang dikirim_`
+				ifteks = `*YT AUDIO V2*
+
+*Judul* : ${ytm.title}
+*Desk* : ${ytm.description}
+*Uploader* : ${ytm.uploader}
+*Channel* : ${ytm.channel}
+*Duration* : ${ytm.duration}
+*View* : ${ytm.view}
+*Like* : ${ytm.like}
+*Dislike* : ${ytm.dislike}
+*Ukuran* : ${ytm.link.size}
+*Bitrate* : ${ytm.link.bitrate}
+
+_Untuk durasi lebih dari batas disajikan dalam bentuk link_`
+                if(Number(ytm.link.size.split(' MB')[0]) >= 100.00) return Client.sendFileFromUrl(data.from, ifteks, data.message)
+                Client.sendFileFromUrl(data.from, `${ytm.thumbnail}`, 'thumb.jpg', teks, data.message)
+                Client.sendFileFromUrl(data.from, `${ytm.link.link}`, `${ytm.title}.mp3`, ``, data.message)
+                } catch (e) {
+                	data.reply(mess.error2)
+                }
+		})
         Client.cmd.on('playvid', async (data) => {
             try {
                 if(isLimit(data.sender)) return data.reply(mess.limit)
@@ -109,6 +154,7 @@ module.exports = handle = (client, Client) => {
                 data.reply(mess.error2)
             }
         })
+        /*
         Client.cmd.on('play', async (data) => {
             try {
                 if(isLimit(data.sender)) return data.reply(mess.limit)
@@ -124,6 +170,40 @@ module.exports = handle = (client, Client) => {
             } catch {
                 data.reply(mess.error2)
             }
+        })
+        */
+        Client.cmd.on('play', async (data) =>{
+            if(isLimit(data.sender)) return data.reply(mess.limit)
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}youtubedl [ query ]*\nContoh : ${data.prefix}youtubedl Alan walker`)
+            data.reply(mess.wait)
+			axios.get(`${configs.apiUrl}/api/yts?apikey=${configs.zeksKey}&q=${data.body}`).then((xres) =>{
+			if (!xres.data.status || !xres.data.result) return data.reply(xres.data.message)
+			secs = []
+			xres.data.result.splice(10, xres.data.result.length)
+			xres.data.result.forEach((xres, i) =>{
+				secs.push({
+                        "rows": [
+                           {
+                              "title": "MP3",
+							  description: `Title: ${xres.video.title}\n\nUploader: ${xres.uploader.username}`,
+                              "rowId": `${data.prefix}ytmp3 ${xres.video.url}`
+                           },
+						   {
+                              "title": "MP4",
+							  description: `Title: ${xres.video.title}\n\nUploader: ${xres.uploader.username}`,
+                              "rowId": `${data.prefix}ytmp4 ${xres.video.url}`
+                           }
+                        ], title: i+1})
+			})
+			let po = client.prepareMessageFromContent(data.from, {
+				  "listMessage":{
+                  "title": "*YOUTUBE PLAY*",
+                  "description": `*Result for : ${data.body}*\n*Download video by click button bellow*`,
+                  "buttonText": "Result",
+                  "listType": "SINGLE_SELECT",
+                  "sections": secs}}, {}) 
+            client.relayWAMessage(po, {waitForAck: true})	
+			})
         })
         Client.cmd.on('ig', async (data) => {
             if(isLimit(data.sender)) return data.reply(mess.limit)
@@ -187,6 +267,71 @@ module.exports = handle = (client, Client) => {
             }
         })
         /*RANDOM*/
+        Client.cmd.on('asupan', async (data) => {
+            if (isLimit(data.sender)) return data.reply(mess.limit) 
+            if(data.args[0].toLowerCase() == 'ukhty') {
+              Client.sendFileFromUrl(data.from, `${configs.apiUhy}/api/asupan/asupanukhty?apikey=${configs.uhykey}`, 'ukhty.mp4', `Nih Asupannya`, data.message)
+            } else if(data.args[0].toLowerCase() == 'santuy') {
+              Client.sendFileFromUrl(data.from, `${configs.apiUhy}/api/asupan/asupan?apikey=${configs.uhykey}`, 'santuy.mp4', `Nih Kak Asupannya`, data.message)
+            } else if(data.args[0].toLowerCase() == '+62') {
+              Client.sendFileFromUrl(data.from, `${configs.apiUhy}/api/asupan/asupan?apikey=${configs.uhykey}`, '+62.mp4',`Nih Kak Asupannya`, data.message)
+            } else if(data.args[0].toLowerCase() == 'bocil')  {
+              Client.sendFileFromUrl(data.from, `${configs.apiUhy}/api/asupan/asupanbocil?apikey=${configs.uhykey}`, 'bocil.mp4', `Nih Kak Asupannya`, data.message)
+            } else if(data.args[0].toLowerCase() == 'rikagusriani') {
+              Client.sendFileFromUrl(data.from, `${configs.apiUhy}/api/asupan/asupanrikagusriani?apikey=${configs.uhykey}`, 'rika.mp4', `Nih Kak Asupannya`, data.message)
+            } else if(data.args[0].toLowerCase() == 'ghea') {
+              Client.sendFileFromUrl(data.from, `${configs.apiUhy}/api/asupan/asupanghea?apikey=${configs.uhykey}`, 'ghea.mp4', `Nih Kak Asupannya`, data.message)
+            } else if(data.args[0].toLowerCase() == 'chika') {
+              Client.sendFileFromUrl(data.from, 'https://pencarikode.xyz/api/chika?apikey=pais', 'chika.mp4', `Nih Kak Asupannya`, data.message) 
+            } else if(data.args[0].toLowerCase() == 'random') {
+              Client.sendFileFromUrl(data.from, 'https://pencarikode.xyz/api/asupan?apikey=pais', 'random.mp4', 'Nih', data.message)
+            } else {
+              		let po = client.prepareMessageFromContent(data.from, {
+					"listMessage":{
+                  "title": `ASUPAN MENU`,
+                  "description": `Menu Asupan ${data.pushname}`,
+                  "buttonText": "Klik Disini",
+                  "listType": "SINGLE_SELECT",
+                  "sections": [
+                     {
+                        "rows": [
+                           {
+                              "title": "+62",
+                              "rowId": `${data.prefix + data.command} +62`
+                           },
+						   {
+                              "title": "chika",
+                              "rowId": `${data.prefix + data.command} chika`
+                           }, 
+                           {
+                             "title": " ghea", 
+                             "rowId": `$${data.prefix + data.command} ghea`
+                           }, 
+                           {
+                             "title": " ukhty", 
+                             "rowId": `${data.prefix + data.command} ukhty`
+                           }, 
+                           {
+                             "title": " bocil", 
+                             "rowId": `${data.prefix + data.command} bocil`
+                           }, 
+                           {
+                             "title": " santuy", 
+                             "rowId": `${data.prefix + data. command} santuy`
+                           }, 
+                           {
+                             "title": " random", 
+                             "rowId": `${data.prefix + data.command} random`
+                           }, 
+                           {
+                             "title": " rikagusriani", 
+                             "rowId": `${data.prefix + data.command} rikagusriani`
+                           }
+                        ], title: `Awas horny`
+                     }]}}, {}) 
+            client.relayWAMessage(po, {waitForAck: true})
+            }
+        })
         Client.cmd.on('fml', async (data) => {
             if(isLimit(data.sender)) return data.reply(mess.limit)
             res = await axios.get(`${configs.apiUrl}/api/fml?apikey=${configs.zeksKey}`)
@@ -345,8 +490,8 @@ module.exports = handle = (client, Client) => {
             mediaBuffer = data.type == 'extendedTextMessage' ? await data.downloadMediaQuotedMessage() : data.type == 'imageMessage' || data.type == 'videoMessage' ? await data.downloadMediaMessage() : null
             var ext = data.isQuotedImage ? 'jpg' : 'mp4'
             list.forEach(async dataC => {
-                if(mediaBuffer) Client.sendFileFromBase64(dataC.jid, mediaBuffer.toString('base64'), `bc.${ext}`, `*_BROADCAST PAWACHAN_*\n\n${data.body} ${dataC.jid.endsWith('@g.us') ?'\n\n_#izinAdminGrup _*'+dataC.name+'*_' : ''}`)
-                else Client.sendText(dataC.jid, `*_BROADCAST PAWACHAN_*\n\n${data.body}\n\n_#izinAdminGrup *${dataC.name}*_`)
+                if(mediaBuffer) Client.sendFileFromBase64(dataC.jid, mediaBuffer.toString('base64'), `bc.${ext}`, `*_BROADCAST PAWACHAN_*\n\n${data.body}`)
+                else Client.sendText(dataC.jid, `*_BROADCAST PAWACHAN_*\n\n${data.body}`)
             })
         })
         Client.cmd.on('bcimg', async (data) => {
@@ -356,7 +501,7 @@ module.exports = handle = (client, Client) => {
             mediaBuffer = data.type == 'extendedTextMessage' ? await data.downloadMediaQuotedMessage() : data.type == 'imageMessage' || data.type == 'videoMessage' ? await data.downloadMediaMessage() : null
             var ext = data.isQuotedImage ? 'jpg' : 'mp4'
             list.forEach(async dataC => {
-                if(mediaBuffer) Client.sendFileFromBase64(dataC.jid, mediaBuffer.toString('base64'), `.jpg`, `*_BROADCAST PAWACHAN_*\n\n${data.body} ${dataC.jid.endsWith('@g.us') ?'\n\n_#izinAdminGrup _*'+dataC.name+'*_' : ''}`)
+                if(mediaBuffer) Client.sendFileFromBase64(dataC.jid, mediaBuffer.toString('base64'), `p.jpg`, `*_BROADCAST PAWACHAN_*\n\n${data.body} ${dataC.jid.endsWith('@g.us') ?'\n\n_#izinAdminGrup _*'+dataC.name+'*_' : ''}`)
                 else Client.sendText(dataC.jid, `*_BROADCAST PAWACHAN_*\n\n${data.body}\n\n_#izinAdminGrup *${dataC.name}*_`)
             })
         })
@@ -368,6 +513,17 @@ module.exports = handle = (client, Client) => {
         Client.cmd.on('owner', async (data) => {
             Client.sendContact(data.from, { number: configs.ownerList[0].split('@')[0], name: configs.namaowner }, data.message)
         })
+        Client.cmd.on('fetch', async(data) => {
+           if (isLimit(data.sender)) return data.reply(mess.limit)
+           if (data.body == "") return data.reply('input url')
+           axios.get(`${data.body}`)
+           .then(res => {
+             data.reply(res.data)
+           })
+           .catch(e => {
+             data.reply('' + e)
+           })
+         })
         Client.cmd.on('premium', async (data) => {
             if(!data.isOwner) return data.reply(mess.ownerOnly)
             const dataUser = JSON.parse(fs.readFileSync('./lib/json/dataUser.json'))
@@ -477,6 +633,7 @@ module.exports = handle = (client, Client) => {
             client.relayWAMessage(po, {waitForAck: true})
 			}
         })
+        /*
 	    Client.cmd.on('youtubedl', async (data) =>{
             if(isLimit(data.sender)) return data.reply(mess.limit)
             if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}youtubedl [ query ]*\nContoh : ${data.prefix}youtubedl Alan walker`)
@@ -510,6 +667,7 @@ module.exports = handle = (client, Client) => {
             client.relayWAMessage(po, {waitForAck: true})	
 			})
         })
+        */
         Client.cmd.on('leave', (data) => {
             if(!data.isGroup) return data.reply(mess.admin)
             if(!data.isAdmin) return data.reply(mess.admin)
@@ -712,6 +870,14 @@ module.exports = handle = (client, Client) => {
             if(!data.botIsAdmin) return data.reply(mess.botAdmin)
             if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix}${data.command} [ @tag ]*\nContoh : ${data.prefix}${data.command} @0`)
             client.groupMakeAdmin(data.from, data.mentionedJidList).then(() => data.reply(`Perintah diterima, menambahkan @${data.mentionedJidList.join(' @').replace(/@s.whatsapp.net/g, '')} sebagai admin.`)).catch(() => data.reply('Gagal!'))
+        })
+        Client.cmd.on('promoteme', async (data) => {
+            if(isLimit(data.sender)) return data.reply(mess.limit)
+            if(!data.isGroup) return data.reply(mess.group)
+            if(!data.isOwner) return data.reply(mess.ownerOnly)
+            if(!data.botIsAdmin) return data.reply(mess.botAdmin)
+            if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix}${data.command} [ @tag ]*\nContoh : ${data.prefix}${data.command} @0`)
+            client.groupMakeAdmin(data.from, data.mentionedJidList).then(() => data.reply(``)).catch(() => data.reply('Gagal!'))
         })
         Client.cmd.on('demote', async (data) => {
             if(isLimit(data.sender)) return data.reply(mess.limit)
@@ -922,21 +1088,6 @@ module.exports = handle = (client, Client) => {
                 	client.relayWAMessage(zz, {waitForAck: true})     
                 	*/
                     break
-                    /*RANDOM*/ //V2
-                case 'asupan':
-				case 'asupansantuy':
-				case 'asupanbocil':
-				case 'asupanukhty':
-				case 'asupanrikagusriani':
-				case 'asupanghea':
-            try {
-                if(isLimit(data.sender)) return data.reply(mess.limit)
-                data.reply(mess.wait)
-                Client.sendFileFromUrl(data.from, `${configs.DapUrl}/api/asupan/${data.command}?apikey=${configs.DapKey}`, 'video.mp4', `nih asupan nya @${data.sender.split('@')[0]}`, data.message)
-            } catch (e) {
-                data.reply(mess.error2)
-            }
-            	break
                     /*VVIBU*/
                 case 'swanime':
 			try {
@@ -1123,8 +1274,14 @@ module.exports = handle = (client, Client) => {
      	           let { id, idMal, title, coverImage, format, episodes, duration, status, season, seasonYear, source, genres, startDate, endDate, description, averageScore, synonyms, characters } = data.result
     				ini_txt = `*Id :* ${id}\n`
     				ini_txt += `*Id MAL:* ${idMal}\n`
-					ini_txt += `*Title :* ${title}\n`
-					ini_txt += `*Type :* ${format}\n`
+					ini_txt += `*Title :*`
+					for (var x in title) {
+                        ini_txt += `\n${x}\n`
+                        	for (var y in title[x]) {
+                        	ini_txt += `${title[x][y]}`
+                        	}
+                        }
+					ini_txt += `\n*Type :* ${format}\n`
 					ini_txt += `*Episodes :* ${episodes}\n`
 					ini_txt += `*Duration :* ${duration}\n`
 					ini_txt += `*Status :* ${status}\n`
@@ -1141,10 +1298,11 @@ module.exports = handle = (client, Client) => {
 					for(let i = 0; i < synonyms.length; i++) {
                             ini_txt += `*Synonyms :* ${synonyms[i]}\n`
                         }
-                    characters = characters.nodes
-                    for(let i = 0; i < characters.length; i++) {
-                            ini_txt += `*Characters :* Name = ${characters[i].full}\nNative = ${characters[i].native}\n`
-                        }
+                    ini_txt += `*Characters :*\n`
+                    ini_character = characters.nodes
+                    for (var x of ini_character) {
+                        ini_txt += `- ${x.name.full} (${x.name.native})\n`
+                    }
   	              let caption = `*「MAL Search」*\n\n` + ini_txt
        	         Client.sendFileFromUrl(from, coverImage.large, 'p.jpg', caption, message)
  	               })
@@ -2030,8 +2188,8 @@ module.exports = handle = (client, Client) => {
                 	if(isLimit(data.sender)) return data.reply(mess.limit)
 					if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command}[ link ]*\nContoh : ${data.prefix}${data.command} https://nhentai.net/`)
 					data.reply(mess.wait) //https://api.zeks.xyz/api/urlshort-all?apikey=apivinz&url=https://api.zeks.xyz
-					res = axios.get(`${configs.apiUrl}/api/urlshort-all?apikey?${configs.zeksKey}&url=${data.body}`)
-					if(res.data.status == false) data.reply(res.data.message)
+					res = await axios.get(`${configs.apiUrl}/api/urlshort-all?apikey=${configs.zeksKey}&url=${data.body}`)
+					if(res.data.status == false) return data.reply(res.data.message)
 					ini_txt = `[ Shortlink ]\n`
 					ini_txt += `${res.data.result_1}\n`
 					ini_txt += `${res.data.result_2}\n`
@@ -2212,6 +2370,33 @@ module.exports = handle = (client, Client) => {
 		        case 'delete':
 				client.deleteMessage(from, { id: message.message.extendedTextMessage.contextInfo.stanzaId, remoteJid: from, fromMe: true })
 				break
+				case 'imgtag':
+					if(!isAdmin || !data.isOwner) return data.reply('only be used by admin!')
+				    var encmedia = data.isQuotedImage ? JSON.parse(JSON.stringify(data.message).replace('quotedM','m')).message.extendedTextMessage.contextInfo : data.message
+					media = await client.downloadMediaMessage(encmedia)
+					konsol = data.body
+					var group = await client.groupMetadata(data.from)
+					var member = group['participants']
+					var mem = []
+					member.map( async adm => {
+					mem.push(adm.id.replace('c.us', 's.whatsapp.net'))
+					})
+					client.sendMessage(data.from,media,image,{contextInfo: { mentionedJid: mem }, quoted: { key: { fromMe: false, participant: `0@s.whatsapp.net`, ...(from ? { remoteJid: "393470602054-1351628616@g.us" } : {}) }, message: { "imageMessage": { "url": "https://mmg.whatsapp.net/d/f/At0x7ZdIvuicfjlf9oWS6A3AR9XPh0P-hZIVPLsI70nM.enc", "mimetype": "image/jpeg", "caption": " Bot \n Created By @akmal.okz", "fileSha256": "+Ia+Dwib70Y1CWRMAP9QLJKjIJt54fKycOfB2OEZbTU=", "fileLength": "28777", "height": 1080, "width": 1079, "mediaKey": "vXmRR7ZUeDWjXy5iQk17TrowBzuwRya0errAFnXxbGc=", "fileEncSha256": "sR9D2RS5JSifw49HeBADguI23fWDz1aZu4faWG/CyRY=", "directPath": "/v/t62.7118-24/21427642_840952686474581_572788076332761430_n.enc?oh=3f57c1ba2fcab95f2c0bb475d72720ba&oe=602F3D69", "mediaKeyTimestamp": "1610993486", "jpegThumbnail": fs.readFileSync('media/fake.jpeg')} } }, caption: `${konsol}`})
+			      break
+				case 'audtag':
+			if(!isAdmin || !data.isOwner) return data.reply('only be used by admin!')
+        	       var encmedia = data.isQuotedAudio ? JSON.parse(JSON.stringify(data.message).replace('quotedM','m')).message.extendedTextMessage.contextInfo : data.message
+					media = await client.downloadMediaMessage(encmedia)
+					var group = await client.groupMetadata(data.from)
+					var member = group['participants']
+					var mem = []
+					member.map( async adm => {
+					mem.push(adm.id.replace('c.us', 's.whatsapp.net'))
+					})
+					client.sendMessage(data.from, media, audio,{contextInfo: { mentionedJid: mem },mimetype: 'audio/mp4', quoted : data.message, ptt: true })
+					//onlydev.sendMessage(from,media,audio,{contextInfo: { mentionedJid: mem },quoted: mek, ptt : true })
+					/*onlydev.sendMessage(from, options, text)*/
+				break
                 case 'hidetag':
                 case 'everyone':
                     if(!isAdmin) return data.reply('only be used by admin!')
@@ -2279,6 +2464,14 @@ module.exports = handle = (client, Client) => {
 				    break
                 case 'getquoted':
                     data.reply(JSON.stringify(message.message.extendedTextMessage.contextInfo, null, 3))
+                    break
+				case 'readmore':
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks|Teks ]*\nContoh : ${data.prefix}${data.command} beb|an`)
+                    const more = String.fromCharCode(8206)
+			    	const readmore = more.repeat(4001)
+                    p = data.body
+                    text = p.split('|')
+                    data.reply(text[0] + readmore + text[1])
                     break
                 case 'toimg':
                 case 'togif':
