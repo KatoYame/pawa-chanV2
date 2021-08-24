@@ -11,17 +11,17 @@
     "XTkey": "MIMINETBOT",
     "BxKey": "Ikyy69",
 	"autoRead": false,
-	"self": false, 
+	"self": false,
 	"maxLimit": 20,
 	"ownerList": ["6282248192917@s.whatsapp.net", "628114811363@s.whatsapp.net"],
-	"imgUrl": "https://api.zeks.xyz/logo.jpg",
-	"apiUrl": "https://api.zeks.me",
+	"imgUrl": "https://i.ibb.co/2tWRLzq/IMG-20210824-WA0264.jpg",
+	"apiUrl": "https://api.zeks.xyz",
 	"lolUrl": "https://api.lolhuman.xyz",
 	"xteamUrl": "https://api.xteam.xyz",
 	"dapUrl": "https://dapuhy-api.herokuapp.com",
 	"leysUrl": "https://leyscoders-api.herokuapp.com",
 	"chipaUrl": "https://api.chipa.xyz",
 	"janUrl": "https://janbot-api.herokuapp.com",
-	"pack": " ㅤ",
-	"author": "ㅤ"
+	"pack": "My Sticker",
+	"author": "wm: pawa-chan"
 }

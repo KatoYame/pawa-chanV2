@@ -1,5 +1,11 @@
-/*Elios & Ben*/
-/*Recode Khaelsan 😎*/
+/*
+
+Elios & Ben
+
+
+recode by Khael
+
+*/
 
 const { GroupSettingChange, WAMessageProto, MessageType, prepareMessageFromContent, relayWAMessage,  processTime } = require('@adiwajshing/baileys')
 const { exec } = require('child_process');
@@ -10,7 +16,8 @@ const afkJs = require('./lib/afk')
 const moment = require('moment-timezone');
 const { mess, menu, ingfo, donate, hargaprem } = require('./lib/text')
 const { color, getBuffer, convertMp3 } = require('./lib/func')
-
+const speed = require('performance-now')
+const os = require('os')
 
 moment.tz.setDefault('Asia/Jayapura').locale('id');
 module.exports = handle = (client, Client) => {
@@ -28,7 +35,7 @@ module.exports = handle = (client, Client) => {
                 data.reply(teks)
                 Client.sendFileFromUrl(data.from, `${ytm.direct_download}`, `${ytm.file_name}`, mess.succes, data.message)
             } catch {
-                data.reply(`[]Error, mungkin karena file lebih dari 100MB`)
+                data.reply(`[ ! ]Error, mungkin karena file lebih dari 100MB`)
             }
         })
         Client.cmd.on('zippyshare', async (data) => {
@@ -61,6 +68,7 @@ module.exports = handle = (client, Client) => {
                 data.reply(mess.error2)
             }
         })
+        /*
         Client.cmd.on('ytmp4', async (data) => {
             try {
                 if(isLimit(data.sender)) return data.reply(mess.limit)
@@ -73,6 +81,49 @@ module.exports = handle = (client, Client) => {
                 if(Number(ytm.size.split(' MB')[0]) >= 100.00) return Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', `*Data Berhasil Didapatkan!*\n\n*Title* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : mp4\n*Link* : ${ytm.link}\n\n_Untuk durasi lebih dari batas disajikan dalam bentuk link_`, data.message)
                 Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', teks, data.message)
                 Client.sendFileFromUrl(data.from, `${ytm.link}`, `${ytm.title} - Download.mp4`, mess.succes, data.message)
+            } catch {
+                data.reply(mess.error2)
+            }
+        })
+        */
+        Client.cmd.on('ytmp4', async (data) => {
+            try {
+                if(isLimit(data.sender)) return data.reply(mess.limit)
+                if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}ytmp4 [ link ]*\nContoh : ${data.prefix}ytmp4 https://www.youtube.com/watch?v=0maWbr0FHKY`)
+                data.reply(mess.wait) //https://api.lolhuman.xyz/api/ytvideo?apikey=BapakLuGay&url=https://www.youtube.com/watch?v=eZskFo64rs8
+                res = await axios.get(`${configs.lolUrl}/api/ytvideo?apikey=${configs.LolKey}&url=${data.body}`)
+                if(res.data.status == false) data.reply(res.data.message)
+                ytm = res.data.result
+                teks = `*YT VIDEO V2*
+
+*Judul* : ${ytm.title}
+*Desk* : ${ytm.description}
+*Uploader* : ${ytm.uploader}
+*Channel* : ${ytm.channel}
+*Duration* : ${ytm.duration}
+*View* : ${ytm.view}
+*Like* : ${ytm.like}
+*Dislike* : ${ytm.dislike}
+*Ukuran* : ${ytm.link.size}
+*Resolusi* : ${ytm.link.resolution}
+
+_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
+				ifteks = `*YT VIDEO V2*
+
+*Judul* : ${ytm.title}
+*Desk* : ${ytm.description}
+*Uploader* : ${ytm.uploader}
+*Channel* : ${ytm.channel}
+*Duration* : ${ytm.duration}
+*View* : ${ytm.view}
+*Like* : ${ytm.like}
+*Dislike* : ${ytm.dislike}
+*Ukuran* : ${ytm.link.size}
+*Resolusi* : ${ytm.link.resolution}
+
+_Untuk durasi lebih dari batas disajikan dalam bentuk link_`
+                if(Number(ytm.link.size.split(' MB')[0]) >= 100.00) return Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', ifteks, data.message)
+                Client.sendFileFromUrl(data.from, `${ytm.link.link}`, `${ytm.title}.mp4`, teks, data.message)
             } catch {
                 data.reply(mess.error2)
             }
@@ -208,18 +259,13 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
         Client.cmd.on('ig', async (data) => {
             if(isLimit(data.sender)) return data.reply(mess.limit)
             if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}ig [ link ]*\nContoh : ${data.prefix}ig https://www.instagram.com/p/CJ8XKFmJ4al/?igshid=1acpcqo44kgkn`)
-            data.reply(mess.wait)
-        	        axios.get(`${configs.lolUrl}/api/instagram2?apikey=${configs.LolKey}&url=${data.body}`)
-  	              .then(({data}) => {
-     	           let { account, caption, media } = data.result
-					ini_txt = `*「IG DOWNLOADER」*\n`
-					ini_txt += `*Username :* ${account.username}\n`
-					ini_txt += `*Nickname :* ${account.full_name}\n`
-					ini_txt += `*Caption :* ${caption}\n`
-                    for(let i = 0; i < media.length; i++) {
-       	         Client.sendFileFromUrl(data.from, media[i], '', ini_txt, data.message)
-       				}
- 	               })
+            data.reply(mess.wait) //https://api.lolhuman.xyz/api/instagram2?apikey=ShiroNeko&url=https://www.instagram.com/reel/CQkycRpDw0H
+            getresult = await axios.get(`${configs.lolUrl}/api/instagram2?apikey=${configs.LolKey}&url=${data.body}`)
+            if(getresult.data.status == false) return data.reply(getresult.data.message)
+            igdl = getresult.data.result
+            for(let i = 0; i < igdl.media.length; i++) {
+                Client.sendFileFromUrl(data.from, igdl.media[i], '', `「 INSTAGRAM 」\n\n*Username*: ${igdl.account.username}\n*Caption*: ${igdl.caption}`, data.message);
+            }
         })
         Client.cmd.on('fb', async (data) => {
             if(isLimit(data.sender)) return data.reply(mess.limit)
@@ -396,6 +442,73 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 		})
 		Client.cmd.on('donasi', async (data) => {
 		data.reply(donate)
+		})
+		/*VVIBU*/
+		Client.cmd.on('waifu2', async (data) => {
+			if(isLimit(data.sender)) return data.reply(mess.limit)
+			const res = await axios.get(`https://waifu.pics/api/sfw/waifu`)
+			const mediaMsg = await client.prepareMessageMedia(await getBuffer(res.data.url), 'imageMessage')
+            const buttonMessage = {
+			      contentText: '*Nih waifu nya*',
+				  footerText: 'Press the button below to get a random waifu image',
+                        "contextInfo": {
+                              participant: data.sender,
+                              stanzaId: data.message.key.id,
+                              quotedMessage: data.message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix}waifu2`,
+                                 buttonText: {
+                                    displayText: `⏯️ Get again`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true}) 
+		})
+        Client.cmd.on('anime2', async (data) => {
+			try {
+			if(isLimit(data.sender)) return data.reply(mess.limit)
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}anime [ query ]*\nContoh : ${data.prefix}anime naruto`)
+            data.reply(mess.wait)
+            const res = await fetch(`https://api.jikan.moe/v3/search/anime?q=${data.body}`)
+			const damta = await res.json()
+			const { title, synopsis, episodes, url, rated, score, image_url } = damta.results[0]
+			Client.sendFileFromUrl(data.from, image_url, 'p.jpg', `*Anime found!*\n\n*Title:* ${title}\n*Episodes:* ${episodes}\n*Rating:* ${rated}\n*Score:* ${score}\n*Synopsis:* ${synopsis}\n*URL*: ${url}`, data.message)
+            } catch {
+                data.reply('Anime not found')
+            }
+		})
+        Client.cmd.on('manga', async (data) => {
+			try {
+			if(isLimit(data.sender)) return data.reply(mess.limit)
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}manga [ query ]*\nContoh : ${data.prefix}manga naruto`)
+            data.reply(mess.wait)
+            const res = await fetch(`https://api.jikan.moe/v3/search/manga?q=${data.body}`)
+			const damta = await res.json()
+			const { title, synopsis, chapters, url, rated, score, image_url } = damta.results[0]
+			Client.sendFileFromUrl(data.from, image_url, 'p.jpg', `*Manga found!*\n\n*Title:* ${title}\n*Chapters:* ${chapters}\n*Rating:* ${rated}\n*Score:* ${score}\n*Synopsis:* ${synopsis}\n*URL*: ${url}`, data.message)
+            } catch {
+                data.reply('Manga not found')
+            }
+		})
+        Client.cmd.on('chara', async (data) => {
+			try {
+			if(isLimit(data.sender)) return data.reply(mess.limit)
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}chara [ query ]*\nContoh : ${data.prefix}manga naruto`)
+            data.reply(mess.wait)
+            const res = await fetch(`https://api.jikan.moe/v3/search/character?q=${data.body}`)
+			const damta = await res.json()
+			const { name, alternative_names, url, image_url } = damta.results[0]
+			Client.sendFileFromUrl(data.from, image_url, 'p.jpg', `*Character found!*\n\n*Name:* ${name}\n*Alternative names:* ${alternative_names}\n*URL*: ${url}`, data.message)
+            } catch {
+                data.reply('Character not found')
+            }
 		})
         /*OWNER*/
         Client.cmd.on('setpp', async (data) => {
@@ -907,6 +1020,26 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
         Client.cmd.on('testing', async (data) => {
             console.log(client)
         })
+        Client.cmd.on('ping', async (data) => {
+        	const timestampi = speed();
+            const latensip = speed() - timestampi
+            data.reply(`*Speed :* ${latensip.toFixed(4)}ms`)
+        })
+        Client.cmd.on('runtime', async (data) => {
+            const formater1 = (seconds) => {
+                    const pad1 = (s) => {
+                        return (s < 10 ? '0' : '') + s
+                    }
+                    const hrs = Math.floor(seconds / (60 * 60))
+                    const mins = Math.floor(seconds % (60 * 60) / 60)
+                    const secs = Math.floor(seconds % 60)
+                    return ' ' + pad1(hrs) + ' : ' + pad1(mins) + ' : ' + pad1(secs)
+                }
+            const uptime1 = process.uptime()
+            const timestampi = speed();
+            const latensip = speed() - timestampi
+			data.reply(`*Runtime :* ${formater1(uptime1)}`)
+        })
         /*IMAGE MAKER*/
         Client.cmd.on('missing', async (data) => {
             if(isLimit(data.sender)) return data.reply(mess.limit)
@@ -1053,12 +1186,38 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 case 'menu':
                 case 'help':
                 case 'list':
-                		data.reply(menu(data.prefix))
-                /*
-                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')
+                let yo = client.user
+			const formater1 = (seconds) => {
+                    const pad1 = (s) => {
+                        return (s < 10 ? '0' : '') + s
+                    }
+                    const hrs = Math.floor(seconds / (60 * 60))
+                    const mins = Math.floor(seconds % (60 * 60) / 60)
+                    const secs = Math.floor(seconds % 60)
+                    return ' ' + pad1(hrs) + ' : ' + pad1(mins) + ' : ' + pad1(secs)
+                }
+            const uptime1 = process.uptime()
+            const timestampi = speed();
+            const latensip = speed() - timestampi
+
+                     const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')
                      const buttonMessage = {
-                           contentText: menu(data.prefix),
-                           footerText: '*PAWA-CHAN BOT*',
+                           contentText: menu(data.prefix, data.pushname),
+                           footerText: `
+*╭──────「 BOT STAT 」──────*
+*├Device :* ${yo.phone.device_manufacturer}
+*├Model :* ${yo.phone.device_model}
+*├WA Ver :* ${yo.phone.wa_version}
+*├MCC :* ${yo.phone.mcc}
+*├MNC :* ${yo.phone.mnc}
+*├OS :* ${yo.phone.os_version}
+*├Platform :* ${os.platform()}
+*├Version :* ${os.version}
+*├Host :* ${os.hostname()}
+*├Runtime :* ${formater1(uptime1)}
+*├Speed :* ${latensip.toFixed(4)}ms
+*├RAM :* ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${Math.round(require('os').totalmem / 1024 / 1024)}MB
+*└───────────────────────`,
                                 "contextInfo": {
 									  mentionedJid: [configs.ownerList[0]],
                                       participant: sender,
@@ -1067,16 +1226,16 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                                      },
                                      buttons: [
                                      {
-                                       buttonId: `${data.prefix}runtime`,
+                                       buttonId: `${data.prefix}ping`,
                                        buttonText: {
-                                          displayText: "*RUNTIME*"
+                                          displayText: "𝐒𝐏𝐄𝐄𝐃"
                                         },
                                          "type": "RESPONSE"
                                      },
                                      {
                                        buttonId: `${data.prefix}owner`,
                                        buttonText: {
-                                          displayText: "*OWNER*"
+                                          displayText: "𝐂𝐑𝐄𝐀𝐓𝐎𝐑"
                                         },
                                          "type": "RESPONSE"
                                      },
@@ -1085,8 +1244,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                                      ...mediaMsg 
                                      }
                     let zz = await client.prepareMessageFromContent(from, {buttonsMessage: buttonMessage}, {})
-                	client.relayWAMessage(zz, {waitForAck: true})     
-                	*/
+                	client.relayWAMessage(zz, {waitForAck: true})
                     break
                     /*VVIBU*/
                 case 'swanime':
@@ -1098,6 +1256,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 data.reply(mess.error2)
             }
 				break
+				/*
 				case 'wait':
            	     if(isLimit(data.sender)) return data.reply(mess.limit)
                         data.reply(mess.wait)
@@ -1117,6 +1276,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 Client.sendFileFromBase64(data.from, getAxios.data.result.video, 'anime.mp4', getAxios.data.result.title_english, data.message)
                 }
                     break
+				*/
                     case 'loli':
               	  try {
               	  if(!data.isGroup) return data.reply(mess.group)
@@ -2435,17 +2595,6 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                     }))
                     break
 						*/
-                case 'tes':
-                case 'ping':
-                case 'speed':
-                    const processsTime = (timestamp, now) => {
-                return moment.duration(now - moment(timestamp * 1000)).asSeconds()
-                }
-                data.reply(`Speed : ${processsTime(message.messageTimestamp.low, moment())} _second_`)
-                    break
-                case 'runtime':
-                data.reply(`Runtime : _${kyun(process.uptime())}_`)
-                break
                 case 'return':
 		        case 'eval':
                     if(!data.isOwner) return data.reply(mess.ownerOnly)
@@ -2517,10 +2666,9 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             	*/
             switch(idStick) {
             	case '2.5453414541226133e+123': //speed
-                    const processsTime = (timestamp, now) => {
-                return moment.duration(now - moment(timestamp * 1000)).asSeconds()
-                }
-                datas.reply(`Speed : ${processsTime(message.messageTimestamp.low, moment())} _second_`)
+                    const timestampi = speed();
+            		const latensip = speed() - timestampi
+					datas.reply(`*Speed :* ${latensip.toFixed(4)}ms`)
                     break
 				case '2.6253426537573744e+123': //runtime
 					datas.reply(`Runtime : _${kyun(process.uptime())}_`)
