@@ -449,9 +449,9 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                            footerText: `Syarat dan Ketentuan Berlaku`,
                                 "contextInfo": {
 									  mentionedJid: [configs.ownerList[0]],
-                                      participant: sender,
-                                      stanzaId: message.key.id,
-                                      quotedMessage: message.message,
+                                      participant: data.sender,
+                                      stanzaId: data.message.key.id,
+                                      quotedMessage: data.message.message,
                                      },
                                      buttons: [
                                      {
@@ -472,7 +472,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                                          headerType: 4,
                                      ...mediaMsg 
                                      }
-                    let zz = await client.prepareMessageFromContent(from, {buttonsMessage: buttonMessage}, {})
+                    let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
                 	client.relayWAMessage(zz, {waitForAck: true})
 		})
 		Client.cmd.on('snk', async (data) => {
@@ -1227,6 +1227,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 case 'menu':
                 case 'help':
                 case 'list':
+                num = `${sender.split("@")[0]}@s.whatsapp.net`
                 let yo = client.user
 			const formater1 = (seconds) => {
                     const pad1 = (s) => {
@@ -1241,9 +1242,31 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             const timestampi = speed();
             const latensip = speed() - timestampi
 
+const time2 = moment().tz('Asia/Jakarta').format('HH:mm:ss')
+if(time2 < "23:59:00"){
+var ucapanWaktu = 'Selamat malam'
+                                        }
+if(time2 < "20:00:00"){
+var ucapanWaktu = 'Selamat petang'
+                                         }
+if(time2 < "18:00:00"){
+var ucapanWaktu = 'Selamat sore'
+                                         }
+if(time2 < "15:00:00"){
+var ucapanWaktu = 'Selamat siang'
+                                         }
+if(time2 < "11:00:00"){
+var ucapanWaktu = 'Selamat pagi'
+                                         }
+if(time2 < "03:30:00"){
+var ucapanWaktu = 'Selamat malam'
+										}
+										
+ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenangkan`
+
                      const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')
                      const buttonMessage = {
-                           contentText: menu(data.prefix, data.pushname),
+                           contentText: ucapanSalam + menu(data.prefix, data.pushname),
                            footerText: `
 *╭─────「 BOT STAT 」──────*
 *├Device :* ${yo.phone.device_manufacturer}
