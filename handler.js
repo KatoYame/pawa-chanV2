@@ -490,8 +490,8 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 			const res = await axios.get(`https://waifu.pics/api/sfw/waifu`)
 			const mediaMsg = await client.prepareMessageMedia(await getBuffer(res.data.url), 'imageMessage')
             const buttonMessage = {
-			      contentText: '*Nih waifu nya*',
-				  footerText: 'Press the button below to get a random waifu image',
+			      contentText: '```NIH WAIFU NYA```',
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ʟᴏʟɪ ɪᴍᴀɢᴇ',
                         "contextInfo": {
                               participant: data.sender,
                               stanzaId: data.message.key.id,
@@ -499,9 +499,9 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 							  },
                               buttons: [
                                 {
-                                 buttonId: `${data.prefix}waifu2`,
+                                 buttonId: `${data.prefix}${data.command}`,
                                  buttonText: {
-                                    displayText: `⏯️ Get again`
+                                    displayText: `🔃`
                                   },
                                   "type": "RESPONSE"
                                 },
@@ -512,46 +512,19 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
             client.relayWAMessage(zz, {waitForAck: true}) 
 		})
-        Client.cmd.on('anime2', async (data) => {
-			try {
-			if(isLimit(data.sender)) return data.reply(mess.limit)
-            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}anime [ query ]*\nContoh : ${data.prefix}anime naruto`)
-            data.reply(mess.wait)
-            const res = await fetch(`https://api.jikan.moe/v3/search/anime?q=${data.body}`)
-			const damta = await res.json()
-			const { title, synopsis, episodes, url, rated, score, image_url } = damta.results[0]
-			Client.sendFileFromUrl(data.from, image_url, 'p.jpg', `*Anime found!*\n\n*Title:* ${title}\n*Episodes:* ${episodes}\n*Rating:* ${rated}\n*Score:* ${score}\n*Synopsis:* ${synopsis}\n*URL*: ${url}`, data.message)
-            } catch {
-                data.reply('Anime not found')
-            }
-		})
-        Client.cmd.on('manga', async (data) => {
-			try {
-			if(isLimit(data.sender)) return data.reply(mess.limit)
-            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}manga [ query ]*\nContoh : ${data.prefix}manga naruto`)
-            data.reply(mess.wait)
-            const res = await fetch(`https://api.jikan.moe/v3/search/manga?q=${data.body}`)
-			const damta = await res.json()
-			const { title, synopsis, chapters, url, rated, score, image_url } = damta.results[0]
-			Client.sendFileFromUrl(data.from, image_url, 'p.jpg', `*Manga found!*\n\n*Title:* ${title}\n*Chapters:* ${chapters}\n*Rating:* ${rated}\n*Score:* ${score}\n*Synopsis:* ${synopsis}\n*URL*: ${url}`, data.message)
-            } catch {
-                data.reply('Manga not found')
-            }
-		})
-        Client.cmd.on('chara', async (data) => {
-			try {
-			if(isLimit(data.sender)) return data.reply(mess.limit)
-            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}chara [ query ]*\nContoh : ${data.prefix}manga naruto`)
-            data.reply(mess.wait)
-            const res = await fetch(`https://api.jikan.moe/v3/search/character?q=${data.body}`)
-			const damta = await res.json()
-			const { name, alternative_names, url, image_url } = damta.results[0]
-			Client.sendFileFromUrl(data.from, image_url, 'p.jpg', `*Character found!*\n\n*Name:* ${name}\n*Alternative names:* ${alternative_names}\n*URL*: ${url}`, data.message)
-            } catch {
-                data.reply('Character not found')
-            }
-		})
         /*OWNER*/
+        Client.cmd.on('self', async (data) => {
+					if (!data.isOwner) return data.reply(mess.ownerOnly)
+					if (Client.self) return data.reply('Already Self Mode')
+					Client.self = true
+					data.reply('OK')
+		})
+		Client.cmd.on('public', async (data) => {
+					if (!data.isOwner) return data.reply(mess.ownerOnly)
+					if (!Client.self) return data.reply('Already Public Mode')
+					Client.self = false
+					data.reply('OK')
+		})
         Client.cmd.on('setpp', async (data) => {
             if(!data.isOwner) return data.reply(mess.ownerOnly)
             if(!data.isQuotedImage && data.type != 'imageMessage') return data.reply(`Wrong format!, please send image with caption ${data.prefix}setgroupicon, or reply image with ${data.prefix}setgroupicon`)
@@ -1262,7 +1235,7 @@ if(time2 < "03:30:00"){
 var ucapanWaktu = 'Selamat malam'
 										}
 										
-ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenangkan`
+ucapanSalam = `${ucapanWaktu} ${sender}, Semoga harimu menyenangkan`
 
                      const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')
                      const buttonMessage = {
@@ -1283,7 +1256,7 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
 *├RAM :* ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${Math.round(require('os').totalmem / 1024 / 1024)}MB
 *└────────────────────*`,
                                 "contextInfo": {
-									  mentionedJid: [configs.ownerList[0]],
+									  mentionedJid: [configs.ownerList[1]],
                                       participant: sender,
                                       stanzaId: message.key.id,
                                       quotedMessage: message.message,
@@ -1345,8 +1318,29 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
               	  try {
               	  if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    data.reply(mess.wait) //https://api.lolhuman.xyz/api/random/loli?apikey=Apikey_Lu
-                    Client.sendFileFromUrl(from, `${configs.lolUrl}/api/random/loli?apikey=${configs.LolKey}`, 'loli.jpg', '```Kabur cok ada lolicon```', message)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(`${configs.lolUrl}/api/random/loli?apikey=${configs.LolKey}`), 'imageMessage')
+					const buttonMessage = {
+			      contentText: '```HALO OM PEDO```',
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ʟᴏʟɪ ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐋𝐎𝐋𝐈`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true}) 
                     } catch {
                         data.reply(mess.error2)
                     }
@@ -1355,8 +1349,29 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
               	  try{
               	  if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    data.reply(mess.wait) //https://api.lolhuman.xyz/api/random/waifu?apikey=Apikey_Lu
-                    Client.sendFileFromUrl(from, `${configs.lolUrl}/api/random/waifu?apikey=${configs.LolKey}`, 'loli.jpg', '```nih waifunya```', message)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(`${configs.lolUrl}/api/random/waifu?apikey=${configs.LolKey}`), 'imageMessage')
+					const buttonMessage = {
+			      contentText: '```NIH WAIFU NYA```',
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ᴡᴀɪғᴜ ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐖𝐀𝐈𝐅𝐔`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error2)
                     }
@@ -1563,22 +1578,60 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
 				    try{
 					if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    data.reply(mess.wait)
-                    lewdd = ["solog", "feet", "smallboobs", "lewdkemo", "gasm", "solo", "avatar", "erokemo", "ero", "holo", "fox_girl", "tits", "eroyuri", "holoero", "yuri", "neko", "hentai", "eron", "erok", "cum_jpg", "nsfw_avatar", "erofeet", "waifu", "lewd", "pussy_jpg", "futanari"]
-					const eroo = lewdd[Math.floor(Math.random() * lewdd.length)]
-                    res = await axios.get(`https://nekos.life/api/v2/img/${eroo}`)
-                    image = res.data.url
-                    Client.sendFileFromUrl(from, image, 'p.jpg', mess.sange, message)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(`${configs.h4ckUrl}/api/nsfw/hentai?apikey=${configs.h4ckKey}`), 'imageMessage')
+					const buttonMessage = {
+			      contentText: mess.sange,
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ʜᴇɴᴛᴀɪ ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
                     break
 					case 'nsfwloli':
         			try{
+        			if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(!isPrem(data.sender)) return data.reply(mess.prem)
-                    data.reply(mess.wait) //https://api.lolhuman.xyz/api/random/nsfw/loli?apikey=APIKEY
-                    Client.sendFileFromUrl(from, `${configs.lolUrl}/api/random/nsfw/loli?apikey=${configs.LolKey}`, 'gambar.jpg', mess.sange, message)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(`${configs.lolUrl}/api/random/nsfw/loli?apikey=${configs.LolKey}`), 'imageMessage')
+					const buttonMessage = {
+			      contentText: ```PEDO BANGSAD CUIH```,
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ʜᴇɴᴛᴀɪ ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
@@ -1587,10 +1640,30 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
 				    try{
 					if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    data.reply(mess.wait)
-                    res = await axios.get(`https://api.waifu.pics/nsfw/neko`)
-                    image = res.data.url
-                    Client.sendFileFromUrl(from, image, 'p.jpg', mess.sange, message)
+                    const res = await axios.get(`https://api.waifu.pics/nsfw/neko`)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(res.data.url), 'imageMessage')
+					const buttonMessage = {
+			      contentText: ```CIH FURRY LOVERS```,
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ʜᴇɴᴛᴀɪ ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
@@ -1600,9 +1673,30 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
 					if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     data.reply(mess.wait)
-                    res = await axios.get(`https://api.waifu.pics/nsfw/waifu`)
-                    image = res.data.url
-                    Client.sendFileFromUrl(from, image, 'p.jpg', mess.sange, message)
+                    const res = await axios.get(`https://api.waifu.pics/nsfw/waifu`)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(res.data.url), 'imageMessage')
+					const buttonMessage = {
+			      contentText: mess.sange,
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ʜᴇɴᴛᴀɪ ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
@@ -1611,10 +1705,30 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
 				    try{
 					if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    data.reply(mess.wait) //https://apixxy.herokuapp.com/api/nsfw/ass?apikey=premiumzx
-                    res = await axios.get(`https://apixxy.herokuapp.com/api/nsfw/ass?apikey=premiumzx`)
-                    image = res.data.result
-                    Client.sendFileFromUrl(from, image, 'p.jpg', mess.sange, message)
+                    const res = await axios.get(`https://apixxy.herokuapp.com/api/nsfw/ass?apikey=premiumzx`)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(res.data.result), 'imageMessage')
+					const buttonMessage = {
+			      contentText: mess.sange,
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ʜᴇɴᴛᴀɪ ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
@@ -1625,8 +1739,29 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
 					if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     res = await axios.get(`https://meme-api.herokuapp.com/gimme/animearmpits`)
-                    image = res.data.url
-                    Client.sendFileFromUrl(from, image, 'p.jpg', mess.sange, message)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(res.data.url), 'imageMessage')
+					const buttonMessage = {
+			      contentText: mess.sange,
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ʜᴇɴᴛᴀɪ ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
@@ -1637,8 +1772,29 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
 					if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     res = await axios.get(`https://meme-api.herokuapp.com/gimme/animethighss`)
-                    image = res.data.url
-                    Client.sendFileFromUrl(from, image, 'p.jpg', mess.sange, message)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(res.data.url), 'imageMessage')
+					const buttonMessage = {
+			      contentText: mess.sange,
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ʜᴇɴᴛᴀɪ ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
@@ -1648,8 +1804,29 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
 					if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     res = await axios.get(`https://meme-api.herokuapp.com/gimme/animebooty`)
-                    image = res.data.url
-                    Client.sendFileFromUrl(from, image, 'p.jpg', mess.sange, message)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(res.data.url), 'imageMessage')
+					const buttonMessage = {
+			      contentText: mess.sange,
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ʜᴇɴᴛᴀɪ ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
@@ -1659,8 +1836,29 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
 					if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     res = await axios.get(`https://meme-api.herokuapp.com/gimme/sideoppai`)
-                    image = res.data.url
-                    Client.sendFileFromUrl(from, image, 'p.jpg', mess.sange, message)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(res.data.url), 'imageMessage')
+					const buttonMessage = {
+			      contentText: mess.sange,
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ʜᴇɴᴛᴀɪ ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
@@ -1670,8 +1868,29 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
 					if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     res = await axios.get(`https://meme-api.herokuapp.com/gimme/ahegao`)
-                    image = res.data.url
-                    Client.sendFileFromUrl(from, image, 'p.jpg', mess.sange, message)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(res.data.url), 'imageMessage')
+					const buttonMessage = {
+			      contentText: mess.sange,
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ʜᴇɴᴛᴀɪ ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
@@ -1682,8 +1901,29 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
 					if(!data.isGroup) return data.reply(mess.group)
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     res = await axios.get(`https://meme-api.herokuapp.com/gimme/anime${data.command}`)
-                    image = res.data.url
-                    Client.sendFileFromUrl(from, image, 'p.jpg', mess.sange, message)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(res.data.url), 'imageMessage')
+					const buttonMessage = {
+			      contentText: mess.sange,
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ʜᴇɴᴛᴀɪ ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
@@ -1698,8 +1938,29 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
         			try{
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     if(!isPrem(data.sender)) return data.reply(mess.prem)
-                    data.reply(mess.wait)
-                    Client.sendFileFromUrl(from, `${configs.lolUrl}/api/random/nsfw/animearmpits?apikey=${configs.LolKey}`, 'gambar.jpg', mess.sange, message)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(`${configs.lolUrl}/api/random/nsfw/animearmpits?apikey=${configs.LolKey}`), 'imageMessage')
+					const buttonMessage = {
+			      contentText: mess.sange,
+				  footerText: 'ᴘʀᴇss ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴀ ʀᴀɴᴅᴏᴍ ᴀʀᴍᴘɪᴛs ɪᴍᴀɢᴇ',
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix}ketek`,
+                                 buttonText: {
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐀𝐑𝐌𝐏𝐈𝐓𝐒`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
@@ -1718,8 +1979,7 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
                 case 'smug':
                 case 'baka':
                 case 'solog':
-                case 'lewdk':
-                case 'waifu':                
+                case 'lewdk':            
                 case 'femdom':
                 case 'cuddle':
                 case 'hentai':
@@ -1738,8 +1998,29 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
                 try{
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     if(!isPrem(data.sender)) return data.reply(mess.prem)
-                    data.reply(mess.wait)
-                    Client.sendFileFromUrl(from, `${configs.lolUrl}/api/random2/${data.command}?apikey=${configs.LolKey}`, 'p.jpg', mess.sange, message)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(`${configs.lolUrl}/api/random2/${data.command}?apikey=${configs.LolKey}`), 'imageMessage')
+					const buttonMessage = {
+			      contentText: mess.sange,
+				  footerText: `Press the Button Below To Get a Random ${data.command} Image`,
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍 *Search ${data.command}*`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
@@ -1766,8 +2047,29 @@ ucapanSalam = `${ucapanWaktu} kak @${num.split("@")[0]}, Semoga harimu menyenang
         			try{
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     if(!isPrem(data.sender)) return data.reply(mess.prem)
-                    data.reply(mess.wait) //https://api.lolhuman.xyz/api/random/nsfw/sideoppai?apikey=beta
-                    Client.sendFileFromUrl(from, `${configs.lolUrl}/api/random/nsfw/${command}?apikey=${configs.LolKey}`, 'gambar.jpg', mess.sange, message)
+                    const mediaMsg = await client.prepareMessageMedia(await getBuffer(`${configs.lolUrl}/api/random/nsfw/${command}?apikey=${configs.LolKey}`), 'imageMessage')
+					const buttonMessage = {
+			      contentText: mess.sange,
+				  footerText: `Press the Button Below To Get a Random ${data.command} Image`,
+                        "contextInfo": {
+                              participant: sender,
+                              stanzaId: message.key.id,
+                              quotedMessage: message.message,
+							  },
+                              buttons: [
+                                {
+                                 buttonId: `${data.prefix + data.command}`,
+                                 buttonText: {
+                                    displayText: `🔍 *Search ${data.command}*`
+                                  },
+                                  "type": "RESPONSE"
+                                },
+                                  ],
+                                   headerType: 4,
+                                ...mediaMsg 
+                                }
+            let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+            client.relayWAMessage(zz, {waitForAck: true})
                     } catch {
                         data.reply(mess.error)
                     }
