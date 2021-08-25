@@ -14,7 +14,7 @@ const fs = require('fs')
 let FormData = require('form-data')
 const afkJs = require('./lib/afk')
 const moment = require('moment-timezone');
-const { mess, menu, ingfo, donate, hargaprem } = require('./lib/text')
+const { mess, menu, ingfo, donate, hargaprem, snk } = require('./lib/text')
 const { color, getBuffer, convertMp3 } = require('./lib/func')
 const speed = require('performance-now')
 const os = require('os')
@@ -97,7 +97,6 @@ module.exports = handle = (client, Client) => {
                 teks = `*YT VIDEO V2*
 
 *Judul* : ${ytm.title}
-*Desk* : ${ytm.description}
 *Uploader* : ${ytm.uploader}
 *Channel* : ${ytm.channel}
 *Duration* : ${ytm.duration}
@@ -106,12 +105,13 @@ module.exports = handle = (client, Client) => {
 *Dislike* : ${ytm.dislike}
 *Ukuran* : ${ytm.link.size}
 *Resolusi* : ${ytm.link.resolution}
+
+*Desk* : ${ytm.description}
 
 _Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
 				ifteks = `*YT VIDEO V2*
 
 *Judul* : ${ytm.title}
-*Desk* : ${ytm.description}
 *Uploader* : ${ytm.uploader}
 *Channel* : ${ytm.channel}
 *Duration* : ${ytm.duration}
@@ -120,6 +120,10 @@ _Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
 *Dislike* : ${ytm.dislike}
 *Ukuran* : ${ytm.link.size}
 *Resolusi* : ${ytm.link.resolution}
+
+*Desk* : ${ytm.description}
+
+*Download* : ${ytm.link.link}
 
 _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 if(Number(ytm.link.size.split(' MB')[0]) >= 100.00) return Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', ifteks, data.message)
@@ -157,7 +161,6 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 teks = `*YT AUDIO V2*
 
 *Judul* : ${ytm.title}
-*Desk* : ${ytm.description}
 *Uploader* : ${ytm.uploader}
 *Channel* : ${ytm.channel}
 *Duration* : ${ytm.duration}
@@ -166,12 +169,13 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 *Dislike* : ${ytm.dislike}
 *Ukuran* : ${ytm.link.size}
 *Bitrate* : ${ytm.link.bitrate}
+
+*Desk* : ${ytm.description}
 
 _Silahkan tunggu file audio sedang dikirim_`
 				ifteks = `*YT AUDIO V2*
 
 *Judul* : ${ytm.title}
-*Desk* : ${ytm.description}
 *Uploader* : ${ytm.uploader}
 *Channel* : ${ytm.channel}
 *Duration* : ${ytm.duration}
@@ -180,6 +184,10 @@ _Silahkan tunggu file audio sedang dikirim_`
 *Dislike* : ${ytm.dislike}
 *Ukuran* : ${ytm.link.size}
 *Bitrate* : ${ytm.link.bitrate}
+
+*Desk* : ${ytm.description}
+
+*Download* : ${ytm.link.link}
 
 _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 if(Number(ytm.link.size.split(' MB')[0]) >= 100.00) return Client.sendFileFromUrl(data.from, ifteks, data.message)
@@ -435,7 +443,40 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 		data.reply(ingfo)
 		})
 		Client.cmd.on('hargaprem', async (data) => {
-		data.reply(hargaprem)
+		const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')
+                     const buttonMessage = {
+                           contentText: hargaprem,
+                           footerText: `Syarat dan Ketentuan Berlaku`,
+                                "contextInfo": {
+									  mentionedJid: [configs.ownerList[0]],
+                                      participant: sender,
+                                      stanzaId: message.key.id,
+                                      quotedMessage: message.message,
+                                     },
+                                     buttons: [
+                                     {
+                                       buttonId: `${data.prefix}snk`,
+                                       buttonText: {
+                                          displayText: "𝐒&𝐊"
+                                        },
+                                         "type": "RESPONSE"
+                                     },
+                                     {
+                                       buttonId: `${data.prefix}owner`,
+                                       buttonText: {
+                                          displayText: "𝐂𝐑𝐄𝐀𝐓𝐎𝐑"
+                                        },
+                                         "type": "RESPONSE"
+                                     },
+                                        ],
+                                         headerType: 4,
+                                     ...mediaMsg 
+                                     }
+                    let zz = await client.prepareMessageFromContent(from, {buttonsMessage: buttonMessage}, {})
+                	client.relayWAMessage(zz, {waitForAck: true})
+		})
+		Client.cmd.on('snk', async (data) => {
+		data.reply(snk)
 		})
 		Client.cmd.on('donate', async (data) => {
 		data.reply(donate)
@@ -726,9 +767,9 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             } else {
 				let po = client.prepareMessageFromContent(data.from, {
 					"listMessage":{
-                  "title": "*WHATSAPP-BOT*",
+                  "title": "*PAWACHAN-BOT*",
                   "description": "pilh on/off",
-                  "buttonText": "COMMANDS",
+                  "buttonText": "Click Here!",
                   "listType": "SINGLE_SELECT",
                   "sections": [
                      {
@@ -800,7 +841,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 					"listMessage":{
                   "title": "パ ワ ー",
                   "description": "pilh on/off",
-                  "buttonText": "COMMANDS",
+                  "buttonText": "Click Here!",
                   "listType": "SINGLE_SELECT",
                   "sections": [
                      {
@@ -838,7 +879,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 					"listMessage":{
                   "title": "*ANTITAGALL*",
                   "description": "pilh on/off",
-                  "buttonText": "COMMANDS",
+                  "buttonText": "Click Here!",
                   "listType": "SINGLE_SELECT",
                   "sections": [
                      {
@@ -875,7 +916,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 					"listMessage":{
                   "title": "パ ワ ー",
                   "description": "pilh on/off",
-                  "buttonText": "COMMANDS",
+                  "buttonText": "Click Here!",
                   "listType": "SINGLE_SELECT",
                   "sections": [
                      {
@@ -914,9 +955,9 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 				let po = client.prepareMessageFromContent(data.from, {
 					"listMessage":{
                   "title": "パ ワ ー",
-                  "description": "pilh open/close",
-                  "buttonText": "COMMANDS",
-                  "listType": "SINGLE_SELECT",
+					"description": "pilh open/close",
+					"buttonText": "Click Here!",
+					"listType": "SINGLE_SELECT",
                   "sections": [
                      {
                         "rows": [
@@ -1204,7 +1245,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                      const buttonMessage = {
                            contentText: menu(data.prefix, data.pushname),
                            footerText: `
-*╭──────「 BOT STAT 」──────*
+*╭─────「 BOT STAT 」──────*
 *├Device :* ${yo.phone.device_manufacturer}
 *├Model :* ${yo.phone.device_model}
 *├WA Ver :* ${yo.phone.wa_version}
@@ -1217,7 +1258,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 *├Runtime :* ${formater1(uptime1)}
 *├Speed :* ${latensip.toFixed(4)}ms
 *├RAM :* ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${Math.round(require('os').totalmem / 1024 / 1024)}MB
-*└───────────────────────`,
+*└────────────────────*`,
                                 "contextInfo": {
 									  mentionedJid: [configs.ownerList[0]],
                                       participant: sender,
