@@ -12,6 +12,7 @@ const { exec } = require('child_process');
 const axios = require('axios')
 const fs = require('fs')
 let FormData = require('form-data')
+let fetch = require('node-fetch')
 const afkJs = require('./lib/afk')
 const moment = require('moment-timezone');
 const { mess, menu, ingfo, donate, hargaprem, snk } = require('./lib/text')
@@ -231,6 +232,41 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             }
         })
         */
+        /*
+	    Client.cmd.on('youtubedl', async (data) =>{
+            if(isLimit(data.sender)) return data.reply(mess.limit)
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}youtubedl [ query ]*\nContoh : ${data.prefix}youtubedl Alan walker`)
+            data.reply(mess.wait)
+			axios.get(`${configs.apiUrl}/api/yts?apikey=${configs.zeksKey}&q=${data.body}`).then((xres) =>{
+			if (!xres.data.status || !xres.data.result) return data.reply(xres.data.message)
+			secs = []
+			xres.data.result.splice(5, xres.data.result.length)
+			xres.data.result.forEach((xres, i) =>{
+				secs.push({
+                        "rows": [
+                           {
+                              "title": "MP3",
+							  description: `Title: ${xres.video.title}\n\nUploader: ${xres.uploader.username}`,
+                              "rowId": `${data.prefix}ytmp3 ${xres.video.url}`
+                           },
+						   {
+                              "title": "MP4",
+							  description: `Title: ${xres.video.title}\n\nUploader: ${xres.uploader.username}`,
+                              "rowId": `${data.prefix}ytmp4 ${xres.video.url}`
+                           }
+                        ], title: i+1})
+			})
+			let po = client.prepareMessageFromContent(data.from, {
+				  "listMessage":{
+                  "title": "*YOUTUBE DOWNLOAD*",
+                  "description": `*Result for : ${data.body}*\n*Download video by click button bellow*`,
+                  "buttonText": "Result",
+                  "listType": "SINGLE_SELECT",
+                  "sections": secs}}, {}) 
+            client.relayWAMessage(po, {waitForAck: true})	
+			})
+        })
+        */
         Client.cmd.on('play', async (data) =>{
             if(isLimit(data.sender)) return data.reply(mess.limit)
             if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}youtubedl [ query ]*\nContoh : ${data.prefix}youtubedl Alan walker`)
@@ -266,8 +302,8 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
         })
         Client.cmd.on('ig', async (data) => {
             if(isLimit(data.sender)) return data.reply(mess.limit)
-            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}ig [ link ]*\nContoh : ${data.prefix}ig https://www.instagram.com/p/CJ8XKFmJ4al/?igshid=1acpcqo44kgkn`)
-            data.reply(mess.wait) //https://api.lolhuman.xyz/api/instagram2?apikey=ShiroNeko&url=https://www.instagram.com/reel/CQkycRpDw0H
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ link ]*\nContoh : ${data.prefix + data.command} https://www.instagram.com/p/CJ8XKFmJ4al/?igshid=1acpcqo44kgkn`)
+            data.reply(mess.wait) //https://api.lolhuman.xyz/api/instagram2?apikey=BAPAKLUGAY&url=https://www.instagram.com/reel/CQkycRpDw0H
             getresult = await axios.get(`${configs.lolUrl}/api/instagram2?apikey=${configs.LolKey}&url=${data.body}`)
             if(getresult.data.status == false) return data.reply(getresult.data.message)
             igdl = getresult.data.result
@@ -277,7 +313,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
         })
         Client.cmd.on('fb', async (data) => {
             if(isLimit(data.sender)) return data.reply(mess.limit)
-            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ link ]*\nContoh : ${data.prefix}${data.command} https://www.facebook.com/TikTokPhilippinesOfficial/videos/248471300073210/`)
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ link ]*\nContoh : ${data.prefix + data.command} https://www.facebook.com/TikTokPhilippinesOfficial/videos/248471300073210/`)
             data.reply(mess.wait) //https://api.lolhuman.xyz/api/facebook2?apikey=APIKEY&url=
             getresult = await axios.get(`${configs.lolUrl}/api/facebook2?apikey=${configs.LolKey}&url=${data.body}`)
             if(getresult.data.status == false) return data.reply(getresult.data.message)
@@ -285,7 +321,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
         })
         Client.cmd.on('tiktok', async (data) => {
             if(isLimit(data.sender)) return data.reply(mess.limit)
-            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ link ]*\nContoh : ${data.prefix}${data.command} https://vt.tiktok.com/ZSwWCk5o/`)
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ link ]*\nContoh : ${data.prefix + data.command} https://vt.tiktok.com/ZSwWCk5o/`)
             data.reply(mess.wait) //https://api.lolhuman.xyz/api/tiktok?apikey=P&url=https://vt.tiktok.com/ZSwWCk5o/
             getresult = await axios.get(`${configs.lolUrl}/api/tiktok?apikey=${configs.LolKey}&url=${data.body}`)
             if(getresult.data.status == false) return data.reply(getresult.data.message)
@@ -294,7 +330,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
         Client.cmd.on('igstory', async (data) => {
             try {
                 if(isLimit(data.sender)) return data.reply(mess.limit)
-                if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}igstory [ username ]*\nContoh : ${data.prefix}igstory jessnolimit`)
+                if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ username ]*\nContoh : ${data.prefix + data.command} jessnolimit`)
                 data.reply(mess.wait)
                 stomr = await axios.get(`${configs.apiUrl}/api/igs?apikey=${configs.zeksKey}&username=${data.body}`)
                 if(stomr.data.status == false) return data.reply(stomr.data.message)
@@ -308,7 +344,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
         Client.cmd.on('joox', async (data) => {
             try {
                 if(isLimit(data.sender)) return data.reply(mess.limit)
-                if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}joox [ lagu ]*\nContoh : ${data.prefix}joox bad liar`)
+                if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ lagu ]*\nContoh : ${data.prefix + data.command} bad liar`)
                 data.reply(mess.wait)
                 res = await axios.get(`${configs.apiUrl}/api/joox?apikey=${configs.zeksKey}&q=${data.body}`)
                 if(res.data.status == false) data.reply(jox.data.message)
@@ -476,7 +512,36 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 	client.relayWAMessage(zz, {waitForAck: true})
 		})
 		Client.cmd.on('snk', async (data) => {
-		data.reply(snk)
+		const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'locationMessage')
+                     const buttonMessage = {
+                           contentText: snk,
+                           footerText: `Syarat dan Ketentuan Berlaku`,
+                                "contextInfo": {
+                                      participant: data.sender,
+                                      stanzaId: data.message.key.id,
+                                      quotedMessage: data.message.message,
+                                     },
+                                     buttons: [
+                                     {
+                                       buttonId: `${data.prefix}hargaprem`,
+                                       buttonText: {
+                                          displayText: "𝐏𝐑𝐄𝐌𝐈𝐔𝐌"
+                                        },
+                                         "type": "RESPONSE"
+                                     },
+                                     {
+                                       buttonId: `${data.prefix}owner`,
+                                       buttonText: {
+                                          displayText: "𝐂𝐑𝐄𝐀𝐓𝐎𝐑"
+                                        },
+                                         "type": "RESPONSE"
+                                     },
+                                        ],
+                                         headerType: "LOCATION",
+                                     ...mediaMsg 
+                                     }
+                    let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+                	client.relayWAMessage(zz, {waitForAck: true})
 		})
 		Client.cmd.on('donate', async (data) => {
 		data.reply(donate)
@@ -485,7 +550,21 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 		data.reply(donate)
 		})
 		/*VVIBU*/
+		Client.cmd.on('anime2', async (data) => {
+			try {
+			if(isLimit(data.sender)) return data.reply(mess.limit)
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}anime [ query ]*\nContoh : ${data.prefix}anime naruto`)
+            data.reply(mess.wait)
+            const res = await fetch(`https://api.jikan.moe/v3/search/anime?q=${data.body}`)
+			const damta = await res.json()
+			const { title, synopsis, episodes, url, rated, score, image_url } = damta.results[0]
+			Client.sendFileFromUrl(data.from, image_url, 'p.jpg', `*Anime found!*\n\n*Title:* ${title}\n*Episodes:* ${episodes}\n*Rating:* ${rated}\n*Score:* ${score}\n*Synopsis:* ${synopsis}\n*URL*: ${url}`, data.message)
+            } catch {
+                data.reply('Anime not found')
+            }
+		})
 		Client.cmd.on('waifu2', async (data) => {
+			try {
 			if(isLimit(data.sender)) return data.reply(mess.limit)
 			const res = await axios.get(`https://waifu.pics/api/sfw/waifu`)
 			const mediaMsg = await client.prepareMessageMedia(await getBuffer(res.data.url), 'imageMessage')
@@ -501,7 +580,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                                 {
                                  buttonId: `${data.prefix}${data.command}`,
                                  buttonText: {
-                                    displayText: `🔃`
+                                    displayText: `🔍SEARCH WAIFU`
                                   },
                                   "type": "RESPONSE"
                                 },
@@ -511,6 +590,35 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                                 }
             let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
             client.relayWAMessage(zz, {waitForAck: true}) 
+            } catch {
+            	data.reply(mess.error + `\nTry Again Later`)
+            }
+		})
+		Client.cmd.on('manga', async (data) => {
+			try {
+			if(isLimit(data.sender)) return data.reply(mess.limit)
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}manga [ query ]*\nContoh : ${data.prefix}manga naruto`)
+            data.reply(mess.wait)
+            const res = await fetch(`https://api.jikan.moe/v3/search/manga?q=${data.body}`)
+			const damta = await res.json()
+			const { title, synopsis, chapters, url, rated, score, image_url } = damta.results[0]
+			Client.sendFileFromUrl(data.from, image_url, 'p.jpg', `*Manga found!*\n\n*Title:* ${title}\n*Chapters:* ${chapters}\n*Rating:* ${rated}\n*Score:* ${score}\n*Synopsis:* ${synopsis}\n*URL*: ${url}`, data.message)
+            } catch {
+                data.reply('Manga not found')
+            }
+		})
+        Client.cmd.on('chara', async (data) => {
+			try {
+			if(isLimit(data.sender)) return data.reply(mess.limit)
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}chara [ query ]*\nContoh : ${data.prefix}manga naruto`)
+            data.reply(mess.wait)
+            const res = await fetch(`https://api.jikan.moe/v3/search/character?q=${data.body}`)
+			const damta = await res.json()
+			const { name, alternative_names, url, image_url } = damta.results[0]
+			Client.sendFileFromUrl(data.from, image_url, 'p.jpg', `*Character found!*\n\n*Name:* ${name}\n*Alternative names:* ${alternative_names}\n*URL*: ${url}`, data.message)
+            } catch {
+                data.reply('Character not found')
+            }
 		})
         /*OWNER*/
         Client.cmd.on('self', async (data) => {
@@ -760,41 +868,6 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             client.relayWAMessage(po, {waitForAck: true})
 			}
         })
-        /*
-	    Client.cmd.on('youtubedl', async (data) =>{
-            if(isLimit(data.sender)) return data.reply(mess.limit)
-            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}youtubedl [ query ]*\nContoh : ${data.prefix}youtubedl Alan walker`)
-            data.reply(mess.wait)
-			axios.get(`${configs.apiUrl}/api/yts?apikey=${configs.zeksKey}&q=${data.body}`).then((xres) =>{
-			if (!xres.data.status || !xres.data.result) return data.reply(xres.data.message)
-			secs = []
-			xres.data.result.splice(5, xres.data.result.length)
-			xres.data.result.forEach((xres, i) =>{
-				secs.push({
-                        "rows": [
-                           {
-                              "title": "MP3",
-							  description: `Title: ${xres.video.title}\n\nUploader: ${xres.uploader.username}`,
-                              "rowId": `${data.prefix}ytmp3 ${xres.video.url}`
-                           },
-						   {
-                              "title": "MP4",
-							  description: `Title: ${xres.video.title}\n\nUploader: ${xres.uploader.username}`,
-                              "rowId": `${data.prefix}ytmp4 ${xres.video.url}`
-                           }
-                        ], title: i+1})
-			})
-			let po = client.prepareMessageFromContent(data.from, {
-				  "listMessage":{
-                  "title": "*YOUTUBE DOWNLOAD*",
-                  "description": `*Result for : ${data.body}*\n*Download video by click button bellow*`,
-                  "buttonText": "Result",
-                  "listType": "SINGLE_SELECT",
-                  "sections": secs}}, {}) 
-            client.relayWAMessage(po, {waitForAck: true})	
-			})
-        })
-        */
         Client.cmd.on('leave', (data) => {
             if(!data.isGroup) return data.reply(mess.admin)
             if(!data.isAdmin) return data.reply(mess.admin)
@@ -815,6 +888,43 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                   "title": "パ ワ ー",
                   "description": "pilh on/off",
                   "buttonText": "Click Here!",
+                  "listType": "SINGLE_SELECT",
+                  "sections": [
+                     {
+                        "rows": [
+                           {
+                              "title": "on",
+                              "rowId": `${data.prefix}${data.command} on`
+                           },
+						   {
+                              "title": "off",
+                              "rowId": `${data.prefix}${data.command} off`
+                           }
+                        ]
+                     }]}}, {}) 
+            client.relayWAMessage(po, {waitForAck: true})
+			}
+        })
+        Client.cmd.on('antiviewonce', (data) => {
+            if(!data.isGroup) return data.reply(mess.admin)
+            if(!data.isAdmin) return data.reply(mess.admin)
+            const dataGc = JSON.parse(fs.readFileSync('./lib/json/dataGc.json'))
+            if(data.args[0].toLowerCase() == 'on') {
+                if(dataGc[data.from].antiviewonce) return data.reply('Already on!')
+                dataGc[data.from].antiviewonce = true
+                fs.writeFileSync('./lib/json/dataGc.json', JSON.stringify(dataGc))
+                data.reply('Sukses!')
+            } else if(data.args[0].toLowerCase() == 'off') {
+                if(!dataGc[data.from].antiviewonce) return data.reply('Already off!')
+                dataGc[data.from].antiviewonce = false
+                fs.writeFileSync('./lib/json/dataGc.json', JSON.stringify(dataGc))
+                data.reply('Sukses!')
+            } else {
+				let po = client.prepareMessageFromContent(data.from, {
+					"listMessage":{
+                  "title": "*PAWACHAN BOT*",
+                  "description": "pilh on/off",
+                  "buttonText": "COMMANDS",
                   "listType": "SINGLE_SELECT",
                   "sections": [
                      {
@@ -1235,7 +1345,7 @@ if(time2 < "03:30:00"){
 var ucapanWaktu = 'Selamat malam'
 										}
 										
-ucapanSalam = `${ucapanWaktu} ${sender}, Semoga harimu menyenangkan`
+ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 
                      const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')
                      const buttonMessage = {
