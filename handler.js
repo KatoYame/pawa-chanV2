@@ -14,6 +14,8 @@ const fs = require('fs')
 let FormData = require('form-data')
 let fetch = require('node-fetch')
 const afkJs = require('./lib/afk')
+const _sewa = require("./lib/sewa");
+let sewa = JSON.parse(fs.readFileSync('./lib/json/sewa.json'));
 const moment = require('moment-timezone');
 const { mess, menu, ingfo, donate, hargaprem, snk } = require('./lib/text')
 const { color, getBuffer, convertMp3 } = require('./lib/func')
@@ -26,8 +28,10 @@ module.exports = handle = (client, Client) => {
         /*DOWNLOADER*/
         Client.cmd.on('gdrive', async (data) => {
             try {
+            	const q = data.body
                 if(isLimit(data.sender)) return data.reply(mess.limit)
-                if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}gdrive [ link ]*\nContoh : ${data.prefix}gdrive https://drive.google.com/file/d/1SugE8vjfOyyW3VTRqsxlW_GJh6EKQ19X/view?usp`)
+                if (!q.includes('https://drive')) return reply(mess.error.Iv)
+                if(q == "") return data.reply(`Kirim perintah *${data.prefix}gdrive [ link ]*\nContoh : ${data.prefix}gdrive https://drive.google.com/file/d/1SugE8vjfOyyW3VTRqsxlW_GJh6EKQ19X/view?usp`)
                 data.reply(mess.wait) //https://api.zeks.xyz/api/gdbypass?apikey=apivinz&url=https://drive.google.com/file/d/1SugE8vjfOyyW3VTRqsxlW_GJh6EKQ19X/view?usp
                 res = await axios.get(`${configs.apiUrl}/api/gdbypass?apikey=${configs.zeksKey}&url=${data.body}`)
                 if(res.data.status == false) data.reply(res.data.message)
@@ -41,8 +45,10 @@ module.exports = handle = (client, Client) => {
         })
         Client.cmd.on('zippyshare', async (data) => {
             try {
+                const q = data.body
                 if(isLimit(data.sender)) return data.reply(mess.limit)
-                if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}zippyshare [ link ]*\nContoh : ${data.prefix}zippyshare https://www51.zippyshare.com/v/5W0TOBz1/file.html`)
+                if (!q.includes('zippyshare')) return reply(mess.inva)
+                if(q == "") return data.reply(`Kirim perintah *${data.prefix}zippyshare [ link ]*\nContoh : ${data.prefix}zippyshare https://www51.zippyshare.com/v/5W0TOBz1/file.html`)
                 data.reply(mess.wait) //https://api.lolhuman.xyz/api/zippyshare?apikey=&url=https://www51.zippyshare.com/v/5W0TOBz1/file.html
                 res = await axios.get(`${configs.lolUrl}/api/zippyshare?apikey=${configs.LolKey}&url=${data.body}`)
                 if(res.data.status == false) data.reply(res.data.message)
@@ -512,10 +518,10 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 	client.relayWAMessage(zz, {waitForAck: true})
 		})
 		Client.cmd.on('snk', async (data) => {
-		const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'locationMessage')
+		const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')
                      const buttonMessage = {
                            contentText: snk,
-                           footerText: `Syarat dan Ketentuan Berlaku`,
+                           footerText: `©ᴘᴀᴡᴀ-ᴄʜᴀɴ ʙᴏᴛ`,
                                 "contextInfo": {
                                       participant: data.sender,
                                       stanzaId: data.message.key.id,
@@ -537,8 +543,8 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                                          "type": "RESPONSE"
                                      },
                                         ],
-                                         headerType: "LOCATION",
-                                     ...mediaMsg 
+                                         headerType: 4,
+                                     ...mediaMsg
                                      }
                     let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
                 	client.relayWAMessage(zz, {waitForAck: true})
@@ -654,7 +660,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             data.reply(`Succecs unblock @${data.mentionedJidList.join(' @').replace(/@s.whatsapp.net/g, '')}`)
         })
         Client.cmd.on('addvn', async (data) => {
-            if(!data.isOwner) return data.reply(mess.ownerOnly)
+			//if(!data.isOwner) return data.reply(mess.ownerOnly)
             if(!data.isQuotedAudio) return data.reply('Reply vn/audio!')
             if(data.body == "") return data.reply(`Kirim perintah ${data.prefix}addvn [ nama ]\nContoh ${data.command}addvn hai`)
             if(vn.includes(data.body)) return data.reply('Nama vn sudah ada, harap gunakan nama lain')
@@ -665,7 +671,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             data.reply(`Berhasil menambahkan vn ${data.body} dari database`)
         })
         Client.cmd.on('delvn', async (data) => {
-            if(!data.isOwner) return data.reply(mess.ownerOnly)
+            //if(!data.isOwner) return data.reply(mess.ownerOnly)
             if(data.body == "") return data.reply(`Kirim perintah ${data.prefix}addvn [ nama ]\nContoh ${data.command}addvn hai`)
             if(!vn.includes(data.body)) return data.reply('vn tidak ditemukan!')
             global.vn.splice(vn.indexOf(data.body), 1)
@@ -1327,22 +1333,19 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 
 const time2 = moment().tz('Asia/Jakarta').format('HH:mm:ss')
 if(time2 < "23:59:00"){
-var ucapanWaktu = 'Selamat malam'
+var ucapanWaktu = 'Selamat malam🌙'
                                         }
-if(time2 < "20:00:00"){
-var ucapanWaktu = 'Selamat petang'
-                                         }
 if(time2 < "18:00:00"){
-var ucapanWaktu = 'Selamat sore'
+var ucapanWaktu = 'Selamat sore🌅'
                                          }
 if(time2 < "15:00:00"){
-var ucapanWaktu = 'Selamat siang'
+var ucapanWaktu = 'Selamat siang☀️'
                                          }
 if(time2 < "11:00:00"){
-var ucapanWaktu = 'Selamat pagi'
+var ucapanWaktu = 'Selamat pagi🌄'
                                          }
 if(time2 < "03:30:00"){
-var ucapanWaktu = 'Selamat malam'
+var ucapanWaktu = 'Selamat malam🌑'
 										}
 										
 ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
@@ -1797,7 +1800,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                                 {
                                  buttonId: `${data.prefix + data.command}`,
                                  buttonText: {
-                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍??𝐀𝐈`
                                   },
                                   "type": "RESPONSE"
                                 },
@@ -2930,6 +2933,16 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                         data.reply(mess.error)
                     }
                     break
+				case 'ssweb2':
+				    try{
+                    if(isLimit(data.sender)) return data.reply(mess.limit)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ link ]*\nContoh : ${data.prefix}${data.command} https://beacons.page/khaelsan`)
+                    data.reply(mess.wait) // https://dapuhy-api.herokuapp.com/api/others/ssweb?url=https://dapuhy-api.herokuapp.com&apikey=DappaGG
+                    Client.sendFileFromUrl(from, `${configs.dapUrl}/api/others/ssweb?url=${data.body}&apikey=${configs.DapKey}`, `ssweb.jpg`, mess.succes, message)
+                    } catch {
+                        data.reply(mess.error)
+                    }
+                    break
                 case 'jsholat':
                 case 'jadwalsholat':
                 case 'jadwalshalat':
@@ -2947,6 +2960,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                     data.reply(res.data.result)
                     break
                     /*GROUP*/
+                    /*
                 case 'antidelete':
 				if(isLimit(data.sender)) return data.reply(mess.limit)
    	         if(!data.isGroup) return data.reply(mess.group)
@@ -3000,6 +3014,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 						data.reply(`Untuk grup penggunaan ${data.prefix}antidelete mati`)
 					}
 				}
+				*/
 				break
                 case 'del':
 		        case 'd':
@@ -3087,6 +3102,39 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 					if (stdout) return data.reply(stdout)
 					})
 				    break
+				/*sewa*/
+				case 'sewa':
+              if (!data.isOwner)return data.reply(mess.)
+              if (!data.isOwner) return data.reply(mess.ownerOnly)
+              if (data.args.length < 1) return data.reply(`Example: *${data.prefix}sewa* add/del waktu`)
+              if (data.args[0].toLowerCase() === 'add'){
+				_sewa.addSewaGroup(from, args[1], sewa)
+              data.reply(`Successfully Hiring Bot In This Group\nSilaahkan ketik ${data.prefix}ceksewa`)
+              } else if (data.args[0].toLowerCase() === 'del'){
+              sewa.splice(_sewa.getSewaPosition(from, sewa), 1)
+              fs.writeFileSync('./lib/json/sewa.json', JSON.stringify(sewa))
+              data.reply(mess.succes)
+              } else {
+              data.reply(`Example: ${data.prefix}sewa add/del waktu`)
+				}
+              break
+  		     case 'sewalist': case 'listsewa':
+              txtnyee = `List Sewa\nJumlah : ${sewa.length}\n\n`
+              for (let i of sewa){
+              cekvipp = ms(i.expired - Date.now())
+              txtnyee += `*ID :* ${i.id} \n*Expire :* ${cekvipp.days} day(s) ${cekvipp.hours} hour(s) ${cekvipp.minutes} minute(s) ${cekvipp.seconds} second(s)\n\n`
+				}
+              data.reply(txtnyee)
+              break
+       case 'sewacheck': case 'ceksewa': 
+       const isSewa = _sewa.checkSewaGroup(from, sewa)
+              if (!data.isGroup) return reply(mess.only.group)
+              if (!isSewa) return reply(`Group ini tidak terdaftar dalam list sewabot.`)
+              cekvip = ms(_sewa.getSewaExpired(from, sewa) - Date.now())
+              premiumnya = `*「 SEWA EXPIRE 」*\n\n➸ *ID*: ${from}\n➸ *Expired :* ${cekvip.days} day(s) ${cekvip.hours} hour(s) ${cekvip.minutes} minute(s)`
+              reply(premiumnya)
+              break
+				/*dll*/
                 case 'getquoted':
                     data.reply(JSON.stringify(message.message.extendedTextMessage.contextInfo, null, 3))
                     break
