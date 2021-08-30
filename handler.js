@@ -11,6 +11,7 @@ const { GroupSettingChange, WAMessageProto, MessageType, prepareMessageFromConte
 const { exec } = require('child_process');
 const axios = require('axios')
 const fs = require('fs')
+const ms = require('parse-ms')
 let FormData = require('form-data')
 let fetch = require('node-fetch')
 const afkJs = require('./lib/afk')
@@ -1800,7 +1801,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                                 {
                                  buttonId: `${data.prefix + data.command}`,
                                  buttonText: {
-                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍??𝐀𝐈`
+                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
                                   },
                                   "type": "RESPONSE"
                                 },
@@ -3104,7 +3105,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 				    break
 				/*sewa*/
 				case 'sewa':
-              if (!data.isOwner)return data.reply(mess.)
+              if (!data.isOwner)return data.reply(mess.group)
               if (!data.isOwner) return data.reply(mess.ownerOnly)
               if (data.args.length < 1) return data.reply(`Example: *${data.prefix}sewa* add/del waktu`)
               if (data.args[0].toLowerCase() === 'add'){
@@ -3128,11 +3129,11 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
               break
        case 'sewacheck': case 'ceksewa': 
        const isSewa = _sewa.checkSewaGroup(from, sewa)
-              if (!data.isGroup) return reply(mess.only.group)
-              if (!isSewa) return reply(`Group ini tidak terdaftar dalam list sewabot.`)
+              if (!data.isGroup) return data.reply(mess.group)
+              if (!isSewa) return data.reply(`Group ini tidak terdaftar dalam list sewabot.`)
               cekvip = ms(_sewa.getSewaExpired(from, sewa) - Date.now())
               premiumnya = `*「 SEWA EXPIRE 」*\n\n➸ *ID*: ${from}\n➸ *Expired :* ${cekvip.days} day(s) ${cekvip.hours} hour(s) ${cekvip.minutes} minute(s)`
-              reply(premiumnya)
+              data.reply(premiumnya)
               break
 				/*dll*/
                 case 'getquoted':
