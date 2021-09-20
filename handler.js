@@ -523,7 +523,7 @@ module.exports = handle = (client, Client) => {
 Limit anda tersisa ${limits || 20}/20
 Limit setiap hari di reset jam 07.00 WIB
 
-_Jika anda ingin limit tanpa batas, beli premium di owner_`
+_Jika ingin anda limit tanpa batas, beli premium di owner_`
 			footer1 = `Untuk info lebih lanjut mengenai premium, bisa tekan tombol 𝐇𝐚𝐫𝐠𝐚 𝐏𝐫𝐞𝐦𝐢𝐮𝐦 dibawah`
             /*const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')*/
                      const buttonMessage = {
