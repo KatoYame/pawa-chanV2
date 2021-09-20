@@ -1,7 +1,7 @@
 {
-  "name": "whatsapp-bot",
+  "name": "Pawa-chan BotWa",
   "description": "whatsapp bot build with nodejs",
-  "repository": "https://github.com/justpiple/whatsapp-bot",
+  "repository": "https://github.com/KhaelSan/pawa-chanV2",
   "logo": "https://api.zeks.xyz/logo.jpg",
   "keywords": ["nodejs", "bot", "whatsapp bot", "whatsapp automation"]
 }
