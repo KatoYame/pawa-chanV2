@@ -17,6 +17,7 @@ let fetch = require('node-fetch')
 const afkJs = require('./lib/afk')
 const _sewa = require("./lib/sewa");
 let sewa = JSON.parse(fs.readFileSync('./lib/json/sewa.json'));
+let nsfw = JSON.parse(fs.readFileSync('./lib/json/nsfw.json'));
 const moment = require('moment-timezone');
 const { mess, menu, ingfo, donate, hargaprem, snk } = require('./lib/text')
 const { color, getBuffer, convertMp3 } = require('./lib/func')
@@ -37,7 +38,13 @@ module.exports = handle = (client, Client) => {
                 res = await axios.get(`${configs.apiUrl}/api/gdbypass?apikey=${configs.zeksKey}&url=${data.body}`)
                 if(res.data.status == false) data.reply(res.data.message)
                 ytm = res.data.data
-                teks = `*Gdrive Downloader*\n\n*Filename* : ${ytm.file_name}\n*Ukuran* : Unknown\n*Link Download* : ${ytm.download_link}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
+                teks = `*「Gdrive Downloader」*
+
+*Filename* : ${ytm.file_name}
+*Ukuran* : Unknown
+*Link Download* : ${ytm.download_link}
+
+*_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_*`
                 data.reply(teks)
                 Client.sendFileFromUrl(data.from, `${ytm.direct_download}`, `${ytm.file_name}`, mess.succes, data.message)
             } catch {
@@ -48,13 +55,19 @@ module.exports = handle = (client, Client) => {
             try {
                 const q = data.body
                 if(isLimit(data.sender)) return data.reply(mess.limit)
-                if (!q.includes('zippyshare')) return reply(mess.inva)
+                if (!data.body.includes('zippyshare')) return reply(mess.inva)
                 if(q == "") return data.reply(`Kirim perintah *${data.prefix}zippyshare [ link ]*\nContoh : ${data.prefix}zippyshare https://www51.zippyshare.com/v/5W0TOBz1/file.html`)
                 data.reply(mess.wait) //https://api.lolhuman.xyz/api/zippyshare?apikey=&url=https://www51.zippyshare.com/v/5W0TOBz1/file.html
                 res = await axios.get(`${configs.lolUrl}/api/zippyshare?apikey=${configs.LolKey}&url=${data.body}`)
                 if(res.data.status == false) data.reply(res.data.message)
                 ytm = res.data.result
-                teks = `*Zippyshare Downloader*\n\n*Filename* : ${ytm.name_file}\n*Ukuran* : ${ytm.size}\n*Uploaded* : ${ytm.date_upload}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
+                teks = `*「Zippyshare Downloader」*
+
+*Filename* : ${ytm.name_file}
+*Ukuran* : ${ytm.size}
+*Uploaded* : ${ytm.date_upload}
+
+*_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_*`
                 data.reply(teks)
                 Client.sendFileFromUrl(data.from, `${ytm.download_url}`, `${ytm.name_file}`, mess.succes, data.message)
             } catch {
@@ -69,7 +82,13 @@ module.exports = handle = (client, Client) => {
                 res = await axios.get(`${configs.lolUrl}/api/mediafire?apikey=${configs.LolKey}&url=${data.body}`)
                 if(res.data.status == false) data.reply(res.data.message)
                 ytm = res.data.result
-                teks = `*Mediafire Downloader*\n\n*Filename* : ${ytm.filename}\n*Ukuran* : ${ytm.filesize}\n*Uploaded* : ${ytm.uploaded}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
+                teks = `*「Mediafire Downloader」*
+
+*Filename* : ${ytm.filename}
+*Ukuran* : ${ytm.filesize}
+*Uploaded* : ${ytm.uploaded}
+
+*_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_*`
                 data.reply(teks)
                 Client.sendFileFromUrl(data.from, `${ytm.link}`, `${ytm.filename}`, mess.succes, data.message)
             } catch {
@@ -102,7 +121,7 @@ module.exports = handle = (client, Client) => {
                 res = await axios.get(`${configs.lolUrl}/api/ytvideo?apikey=${configs.LolKey}&url=${data.body}`)
                 if(res.data.status == false) data.reply(res.data.message)
                 ytm = res.data.result
-                teks = `*YT VIDEO V2*
+                teks = `*「YT VIDEO V2」*
 
 *Judul* : ${ytm.title}
 *Uploader* : ${ytm.uploader}
@@ -114,10 +133,8 @@ module.exports = handle = (client, Client) => {
 *Ukuran* : ${ytm.link.size}
 *Resolusi* : ${ytm.link.resolution}
 
-*Desk* : ${ytm.description}
-
-_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
-				ifteks = `*YT VIDEO V2*
+*Desk* : ${ytm.description}`
+				ifteks = `*「YT VIDEO V2」*
 
 *Judul* : ${ytm.title}
 *Uploader* : ${ytm.uploader}
@@ -133,11 +150,12 @@ _Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
 
 *Download* : ${ytm.link.link}
 
-_Untuk durasi lebih dari batas disajikan dalam bentuk link_`
+*_Untuk durasi lebih dari batas disajikan dalam bentuk link_*`
                 if(Number(ytm.link.size.split(' MB')[0]) >= 100.00) return Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', ifteks, data.message)
                 Client.sendFileFromUrl(data.from, `${ytm.link.link}`, `${ytm.title}.mp4`, teks, data.message)
-            } catch {
+            } catch (e) {
                 data.reply(mess.error2)
+                console.log(e)
             }
         })
         /*
@@ -166,7 +184,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 res = await axios.get(`${configs.lolUrl}/api/ytaudio?apikey=${configs.LolKey}&url=${data.body}`)
                 if(res.data.status == false) data.reply(res.data.message)
                 ytm = res.data.result
-                teks = `*YT AUDIO V2*
+                teks = `*「YT AUDIO V2」*
 
 *Judul* : ${ytm.title}
 *Uploader* : ${ytm.uploader}
@@ -180,8 +198,8 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 
 *Desk* : ${ytm.description}
 
-_Silahkan tunggu file audio sedang dikirim_`
-				ifteks = `*YT AUDIO V2*
+*_Silahkan tunggu file audio sedang dikirim_*`
+				ifteks = `*「YT AUDIO V2」*
 
 *Judul* : ${ytm.title}
 *Uploader* : ${ytm.uploader}
@@ -197,7 +215,7 @@ _Silahkan tunggu file audio sedang dikirim_`
 
 *Download* : ${ytm.link.link}
 
-_Untuk durasi lebih dari batas disajikan dalam bentuk link_`
+*_Untuk durasi lebih dari batas disajikan dalam bentuk link_*`
                 if(Number(ytm.link.size.split(' MB')[0]) >= 100.00) return Client.sendFileFromUrl(data.from, ifteks, data.message)
                 Client.sendFileFromUrl(data.from, `${ytm.thumbnail}`, 'thumb.jpg', teks, data.message)
                 Client.sendFileFromUrl(data.from, `${ytm.link.link}`, `${ytm.title}.mp3`, ``, data.message)
@@ -213,7 +231,15 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 res = await axios.get(`${configs.apiUrl}/api/ytplaymp4/2?apikey=${configs.zeksKey}&q=${data.body}`)
                 if(res.data.status == false) data.reply(res.data.message)
                 ytm = res.data.result
-                teks = `*Data berhasil didapatkan!*\n\n*Judul* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : ${ytm.ext}\n*Source* : ${ytm.source}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
+                teks = `*「YT PLAY VIDEO」*
+
+*Judul* : ${ytm.title}
+*Ukuran* : ${ytm.size}
+*Kualitas* : ${ytm.quality}
+*Ext* : ${ytm.ext}
+*Source* : ${ytm.source}
+
+*_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_*`
                 if(Number(ytm.size.split(' MB')[0]) >= 100.00) return Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', `*Data Berhasil Didapatkan!*\n\n*Title* : ${ytm.title}\n*Ukuran* : ${ytm.size}\n*Kualitas* : ${ytm.quality}\n*Ext* : mp4\n*Source* : ${ytm.source}\n*Link* : ${ytm.link}\n\n_Untuk durasi lebih dari batas disajikan dalam bentuk link_`, data.message)
                 Client.sendFileFromUrl(data.from, `${ytm.thumb}`, 'thumb.jpg', teks, data.message)
                 Client.sendFileFromUrl(data.from, `${ytm.link}`, 'video.mp4', mess.succes, data.message)
@@ -276,9 +302,9 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
         */
         Client.cmd.on('play', async (data) =>{
             if(isLimit(data.sender)) return data.reply(mess.limit)
-            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}youtubedl [ query ]*\nContoh : ${data.prefix}youtubedl Alan walker`)
-            data.reply(mess.wait)
-			axios.get(`${configs.apiUrl}/api/yts?apikey=${configs.zeksKey}&q=${data.body}`).then((xres) =>{
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}play [ query ]*\nContoh : ${data.prefix}play Alan walker`)
+            data.reply(mess.wait) //https://api.lolhuman.xyz/api/ytsearch?apikey=Bap&query=melukis%20senja
+			axios.get(`${configs.lolUrl}/api/ytsearch?apikey=${configs.LolKey}&query=${data.body}`).then((xres) =>{
 			if (!xres.data.status || !xres.data.result) return data.reply(xres.data.message)
 			secs = []
 			xres.data.result.splice(10, xres.data.result.length)
@@ -286,22 +312,22 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 				secs.push({
                         "rows": [
                            {
-                              "title": "MP3",
-							  description: `Title: ${xres.video.title}\n\nUploader: ${xres.uploader.username}`,
-                              "rowId": `${data.prefix}ytmp3 ${xres.video.url}`
+                              "title": "𝐀𝐔𝐃𝐈𝐎/𝐌𝐏𝟑",
+							  description: `\nTitle: ${xres.title}\nViews: ${xres.views}\nPublished: ${xres.published}`,
+                              "rowId": `${data.prefix}ytmp3 https://youtu.be/${xres.videoId}`
                            },
 						   {
-                              "title": "MP4",
-							  description: `Title: ${xres.video.title}\n\nUploader: ${xres.uploader.username}`,
-                              "rowId": `${data.prefix}ytmp4 ${xres.video.url}`
+                              "title": "𝐕𝐈𝐃𝐄𝐎/𝐌𝐏𝟒",
+							  description: `\nTitle: ${xres.title}\nViews: ${xres.views}\nPublished: ${xres.published}`,
+                              "rowId": `${data.prefix}ytmp4 https://youtu.be/${xres.videoId}`
                            }
                         ], title: i+1})
 			})
 			let po = client.prepareMessageFromContent(data.from, {
 				  "listMessage":{
-                  "title": "*YOUTUBE PLAY*",
-                  "description": `*Result for : ${data.body}*\n*Download video by click button bellow*`,
-                  "buttonText": "Result",
+                  "title": "「YOUTUBE PLAY」",
+                  "description": `*Hasil dari :* ${data.body}\n\nᴄʟɪᴄᴋ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ғᴏʀ ᴅᴏᴡɴʟᴏᴀᴅ ᴍᴘ𝟺/ᴍᴘ𝟹`,
+                  "buttonText": "Click Here!",
                   "listType": "SINGLE_SELECT",
                   "sections": secs}}, {}) 
             client.relayWAMessage(po, {waitForAck: true})	
@@ -310,12 +336,12 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
         Client.cmd.on('ig', async (data) => {
             if(isLimit(data.sender)) return data.reply(mess.limit)
             if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ link ]*\nContoh : ${data.prefix + data.command} https://www.instagram.com/p/CJ8XKFmJ4al/?igshid=1acpcqo44kgkn`)
-            data.reply(mess.wait) //https://api.lolhuman.xyz/api/instagram2?apikey=BAPAKLUGAY&url=https://www.instagram.com/reel/CQkycRpDw0H
+            data.reply(mess.wait) //https://api.lolhuman.xyz/api/instagram2?apikey=kkkkk&url=https://www.instagram.com/p/CTSBdlGILTA/?utm_medium=copy_link
             getresult = await axios.get(`${configs.lolUrl}/api/instagram2?apikey=${configs.LolKey}&url=${data.body}`)
             if(getresult.data.status == false) return data.reply(getresult.data.message)
             igdl = getresult.data.result
             for(let i = 0; i < igdl.media.length; i++) {
-                Client.sendFileFromUrl(data.from, igdl.media[i], '', `「 INSTAGRAM 」\n\n*Username*: ${igdl.account.username}\n*Caption*: ${igdl.caption}`, data.message);
+                Client.sendFileFromUrl(data.from, igdl.media[i], '', `*「INSTAGRAM」*\n\n*Username :* ${igdl.account.username}\n*Caption :* ${igdl.caption}\n*_Follow IG Owner https://instagram.com/khaelll.__*`, data.message);
             }
         })
         Client.cmd.on('fb', async (data) => {
@@ -331,8 +357,14 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ link ]*\nContoh : ${data.prefix + data.command} https://vt.tiktok.com/ZSwWCk5o/`)
             data.reply(mess.wait) //https://api.lolhuman.xyz/api/tiktok?apikey=P&url=https://vt.tiktok.com/ZSwWCk5o/
             getresult = await axios.get(`${configs.lolUrl}/api/tiktok?apikey=${configs.LolKey}&url=${data.body}`)
+            teks = `*「TIKTOK DOWNLOADER」*
+
+*Author :* ${getresult.data.result.author.username}
+*Title :* ${getresult.data.result.title}
+*Keywords :* ${getresult.data.result.keywords}
+*Duration :* ${getresult.data.result.duration}`
             if(getresult.data.status == false) return data.reply(getresult.data.message)
-                Client.sendFileFromUrl(data.from, `${configs.dapUrl}/api/socialmedia/tiktoknowm?url=${data.body}&apikey=${configs.DapKey}`, 'tiktok.mp4', `*「TIKTOK DOWNLOADER」*\n\n*Author :* ${getresult.data.result.author.username}\n*Title :* ${getresult.data.result.title}\n*Keywords :* ${getresult.data.result.keywords}\n*Duration :* ${getresult.data.result.duration}`, data.message);
+                Client.sendFileFromUrl(data.from, `${configs.dapUrl}/api/socialmedia/tiktoknowm?url=${data.body}&apikey=${configs.DapKey}`, 'tiktok.mp4', teks, data.message);
         })
         Client.cmd.on('igstory', async (data) => {
             try {
@@ -345,7 +377,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                     Client.sendFileFromUrl(data.from, stomr.data.data[i].url, `ig.${stomr.data.data[i].type}`, `「 INSTAGRAM 」\n\n*Username*: ${stomr.data.username}\n*Type*: ${stomr.data.data[i].type}`, data.message);
                 }
             } catch {
-                data.reply('Username tidak ditemukan')
+                data.reply(mess.error)
             }
         })
         Client.cmd.on('joox', async (data) => {
@@ -356,7 +388,14 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 res = await axios.get(`${configs.apiUrl}/api/joox?apikey=${configs.zeksKey}&q=${data.body}`)
                 if(res.data.status == false) data.reply(jox.data.message)
                 jox = res.data.data[0]
-                teks = `*Data berhasil didapatkan!*\n\n*Judul* : ${jox.judul}\n*Artis* : ${jox.artist}\n*Album* : ${jox.album}\n*Ukuran* : ${jox.size}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
+                teks = `*「JOOX PLAY」*
+
+*Judul* : ${jox.judul}
+*Artis* : ${jox.artist}
+*Album* : ${jox.album}
+*Ukuran* : ${jox.size}
+
+*_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_*`
                 Client.sendFileFromUrl(data.from, `${jox.thumb}`, 'thumb.jpg', teks, data.message)
                 Client.sendFileFromUrl(data.from, `${jox.audio}`, 'audio.mp3', ``, data.message)
             } catch {
@@ -480,13 +519,80 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             if(dataUser[data.sender].premium) return data.reply(`Hai @${data.sender.split('@')[0]} 👋🏻\nAnda adalah user premium yang memiliki akses tanpa batas limit!`)
             limits = configs.maxLimit - dataUser[data.sender].limit
             if(limits <= 0) return data.reply("```" + `Limit anda sudah habis` + "```")
-            data.reply(`Hai @${data.sender.split('@')[0]} 👋🏻\n Limit anda tersisa ${limits || 30}\nLimit setiap hari di reset jam 00.00\nJika anda ingin mendapatkan unlimited limit silahkan beli premium di ketik: #hargaprem`)
+            text1 = `Hai @${data.sender.split('@')[0]} 👋🏻
+Limit anda tersisa ${limits || 20}/20
+Limit setiap hari di reset jam 07.00 WIB
+
+_Jika anda ingin limit tanpa batas, beli premium di owner_`
+			footer1 = `Untuk info lebih lanjut mengenai premium, bisa tekan tombol 𝐇𝐚𝐫𝐠𝐚 𝐏𝐫𝐞𝐦𝐢𝐮𝐦 dibawah`
+            /*const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')*/
+                     const buttonMessage = {
+                           contentText: text1,
+                           footerText: footer1,
+                                "contextInfo": {
+									  mentionedJid: [configs.ownerList[1]],
+                                      participant: data.sender,
+                                      stanzaId: data.message.key.id,
+                                      quotedMessage: data.message.message,
+                                     },
+                                     buttons: [
+                                     {
+                                       buttonId: `${data.prefix}hargaprem`,
+                                       buttonText: {
+                                          displayText: "𝐇𝐚𝐫𝐠𝐚 𝐏𝐫𝐞𝐦𝐢𝐮𝐦"
+                                        },
+                                         "type": "RESPONSE"
+                                     },
+                                     {
+                                       buttonId: `${data.prefix}owner`,
+                                       buttonText: {
+                                          displayText: "𝐎𝐖𝐍𝐄𝐑"
+                                        },
+                                         "type": "RESPONSE"
+                                     },
+                                        ],
+                                         headerType: 1 // 4 for Image, 5 for video, 6 for location
+                                     /*...mediaMsg*/
+                                     }
+                    let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
+                	client.relayWAMessage(zz, {waitForAck: true})
         })
         Client.cmd.on('info', async (data) => {
-		data.reply(ingfo)
+        	let yo = client.user
+        const formater1 = (seconds) => {
+                    const pad1 = (s) => {
+                        return (s < 10 ? '0' : '') + s
+                    }
+                    const hrs = Math.floor(seconds / (60 * 60))
+                    const mins = Math.floor(seconds % (60 * 60) / 60)
+                    const secs = Math.floor(seconds % 60)
+                    return ' ' + pad1(hrs) + ' : ' + pad1(mins) + ' : ' + pad1(secs)
+                }
+            const uptime1 = process.uptime()
+            const timestampi = speed();
+            const latensip = speed() - timestampi
+        imfo = `*╭─「 BOT STAT 」*
+*│*
+*├▣Device :* ${yo.phone.device_manufacturer}
+*├▣Model :* ${yo.phone.device_model}
+*├▣WA Ver :* ${yo.phone.wa_version}
+*├▣MCC :* ${yo.phone.mcc}
+*├▣MNC :* ${yo.phone.mnc}
+*├▣OS :* ${yo.phone.os_version}
+*├▣Platform :* ${os.platform()}
+*├▣Version :* ${os.version}
+*├▣Host :* ${os.hostname()}
+*├▣Runtime :* ${formater1(uptime1)}
+*├▣Speed :* ${latensip.toFixed(4)}ms
+*├▣RAM :* ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${Math.round(require('os').totalmem / 1024 / 1024)}MB
+*│*
+*└──*\n\n`
+		data.reply(imfo + ingfo)
 		})
 		Client.cmd.on('hargaprem', async (data) => {
+			/*
 		const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')
+			*/
                      const buttonMessage = {
                            contentText: hargaprem,
                            footerText: `Syarat dan Ketentuan Berlaku`,
@@ -512,14 +618,14 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                                          "type": "RESPONSE"
                                      },
                                         ],
-                                         headerType: 4,
-                                     ...mediaMsg 
+                                         headerType: 1, // 1 for text, 4 for image, 5 for video, 6 for location
+                                     //...mediaMsg 
                                      }
                     let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
                 	client.relayWAMessage(zz, {waitForAck: true})
 		})
 		Client.cmd.on('snk', async (data) => {
-		const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')
+		//const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')
                      const buttonMessage = {
                            contentText: snk,
                            footerText: `©ᴘᴀᴡᴀ-ᴄʜᴀɴ ʙᴏᴛ`,
@@ -544,8 +650,8 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                                          "type": "RESPONSE"
                                      },
                                         ],
-                                         headerType: 4,
-                                     ...mediaMsg
+                                         headerType: 1,
+                                     //...mediaMsg
                                      }
                     let zz = await client.prepareMessageFromContent(data.from, {buttonsMessage: buttonMessage}, {})
                 	client.relayWAMessage(zz, {waitForAck: true})
@@ -585,7 +691,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 							  },
                               buttons: [
                                 {
-                                 buttonId: `${data.prefix}${data.command}`,
+                                 buttonId: `${data.prefix + data.command}`,
                                  buttonText: {
                                     displayText: `🔍SEARCH WAIFU`
                                   },
@@ -614,6 +720,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 data.reply('Manga not found')
             }
 		})
+		/*
         Client.cmd.on('chara', async (data) => {
 			try {
 			if(isLimit(data.sender)) return data.reply(mess.limit)
@@ -627,6 +734,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 data.reply('Character not found')
             }
 		})
+		*/
         /*OWNER*/
         Client.cmd.on('self', async (data) => {
 					if (!data.isOwner) return data.reply(mess.ownerOnly)
@@ -650,13 +758,13 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
         })
         Client.cmd.on('block', async (data) => {
             if(!data.isOwner) return data.reply(mess.ownerOnly)
-            if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix}${data.command} [ @tag ]*\nContoh : ${data.prefix}${data.command} @0`)
+            if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix + data.command} [ @tag ]*\nContoh : ${data.prefix + data.command} @0`)
             data.mentionedJidList.forEach(jids => client.blockUser(jids, "add"))
             data.reply(`Succecs block @${data.mentionedJidList.join(' @').replace(/@s.whatsapp.net/g, '')}`)
         })
         Client.cmd.on('unblock', async (data) => {
             if(!data.isOwner) return data.reply(mess.ownerOnly)
-            if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix}${data.command} [ @tag ]*\nContoh : ${data.prefix}${data.command} @0`)
+            if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix + data.command} [ @tag ]*\nContoh : ${data.prefix + data.command} @0`)
             data.mentionedJidList.forEach(jids => client.blockUser(jids, "remove"))
             data.reply(`Succecs unblock @${data.mentionedJidList.join(' @').replace(/@s.whatsapp.net/g, '')}`)
         })
@@ -780,7 +888,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                     dataUser[nums].premium = true
                 })
                 fs.writeFileSync('./lib/json/dataUser.json', JSON.stringify(dataUser))
-                data.reply(`Berhasil menambahkan user premium @${dataToPr.join(' @').replace(/@s.whatsapp.net/g, '')}`)
+                data.reply(`Berhasil menambahkan @${dataToPr.join(' @').replace(/@s.whatsapp.net/g, '')} sebagai user premium`)
             } else if(data.args[0].toLowerCase() == 'del') {
                 if(data.args.length < 2) return data.reply('what?')
                 dataToPr.forEach(nums => {
@@ -864,11 +972,11 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                         "rows": [
                            {
                               "title": "on",
-                              "rowId": `${data.prefix}${data.command} on`
+                              "rowId": `${data.prefix + data.command} on`
                            },
 						   {
                               "title": "off",
-                              "rowId": `${data.prefix}${data.command} off`
+                              "rowId": `${data.prefix + data.command} off`
                            }
                         ]
                      }]}}, {}) 
@@ -901,11 +1009,11 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                         "rows": [
                            {
                               "title": "on",
-                              "rowId": `${data.prefix}${data.command} on`
+                              "rowId": `${data.prefix + data.command} on`
                            },
 						   {
                               "title": "off",
-                              "rowId": `${data.prefix}${data.command} off`
+                              "rowId": `${data.prefix + data.command} off`
                            }
                         ]
                      }]}}, {}) 
@@ -938,11 +1046,11 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                         "rows": [
                            {
                               "title": "on",
-                              "rowId": `${data.prefix}${data.command} on`
+                              "rowId": `${data.prefix + data.command} on`
                            },
 						   {
                               "title": "off",
-                              "rowId": `${data.prefix}${data.command} off`
+                              "rowId": `${data.prefix + data.command} off`
                            }
                         ]
                      }]}}, {}) 
@@ -976,11 +1084,11 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                         "rows": [
                            {
                               "title": "on",
-                              "rowId": `${data.prefix}${data.command} on`
+                              "rowId": `${data.prefix + data.command} on`
                            },
 						   {
                               "title": "off",
-                              "rowId": `${data.prefix}${data.command} off`
+                              "rowId": `${data.prefix + data.command} off`
                            }
                         ]
                      }]}}, {}) 
@@ -1013,11 +1121,11 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                         "rows": [
                            {
                               "title": "on",
-                              "rowId": `${data.prefix}${data.command} on`
+                              "rowId": `${data.prefix + data.command} on`
                            },
 						   {
                               "title": "off",
-                              "rowId": `${data.prefix}${data.command} off`
+                              "rowId": `${data.prefix + data.command} off`
                            }
                         ]
                      }]}}, {}) 
@@ -1053,11 +1161,11 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                         "rows": [
                            {
                               "title": "open",
-                              "rowId": `${data.prefix}${data.command} open`
+                              "rowId": `${data.prefix + data.command} open`
                            },
 						   {
                               "title": "close",
-                              "rowId": `${data.prefix}${data.command} close`
+                              "rowId": `${data.prefix + data.command} close`
                            }
                         ]
                      }]}}, {}) 
@@ -1095,7 +1203,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             if(!data.isGroup) return data.reply(mess.group)
             if(!data.isAdmin) return data.reply(mess.admin)
             if(!data.botIsAdmin) return data.reply(mess.botAdmin)
-            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ text ]*\nContoh : ${data.prefix}${data.command} Pawachan`)
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ text ]*\nContoh : ${data.prefix + data.command} Pawachan`)
             client.groupUpdateSubject(data.from, `${data.body}`)
             data.reply(`Nama group telah diganti oleh admin @${data.sender.split('@')[0]}`)
         })
@@ -1103,7 +1211,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             if(!data.isGroup) return data.reply(mess.group)
             if(!data.isAdmin) return data.reply(mess.admin)
             if(!data.botIsAdmin) return data.reply(mess.botAdmin)
-            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ text ]*\nContoh : ${data.prefix}${data.command} Pawachan`)
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ text ]*\nContoh : ${data.prefix + data.command} Pawachan`)
             client.groupUpdateDescription(data.from, `${data.body}`)
             data.reply(`Deskripsi group telah diganti oleh admin @${data.sender.split('@')[0]}`)
         })
@@ -1112,7 +1220,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             if(!data.isGroup) return data.reply(mess.group)
             if(!data.isAdmin) return data.reply(mess.admin)
             if(!data.botIsAdmin) return data.reply(mess.botAdmin)
-            if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix}${data.command} [ @tag ]*\nContoh : ${data.prefix}${data.command} @0`)
+            if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix + data.command} [ @tag ]*\nContoh : ${data.prefix + data.command} @0`)
             client.groupMakeAdmin(data.from, data.mentionedJidList).then(() => data.reply(`Perintah diterima, menambahkan @${data.mentionedJidList.join(' @').replace(/@s.whatsapp.net/g, '')} sebagai admin.`)).catch(() => data.reply('Gagal!'))
         })
         Client.cmd.on('promoteme', async (data) => {
@@ -1120,7 +1228,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             if(!data.isGroup) return data.reply(mess.group)
             if(!data.isOwner) return data.reply(mess.ownerOnly)
             if(!data.botIsAdmin) return data.reply(mess.botAdmin)
-            if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix}${data.command} [ @tag ]*\nContoh : ${data.prefix}${data.command} @0`)
+            if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix + data.command} [ @tag ]*\nContoh : ${data.prefix + data.command} @0`)
             client.groupMakeAdmin(data.from, data.mentionedJidList).then(() => data.reply(``)).catch(() => data.reply('Gagal!'))
         })
         Client.cmd.on('demote', async (data) => {
@@ -1128,7 +1236,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             if(!data.isGroup) return data.reply(mess.group)
             if(!data.isAdmin) return data.reply(mess.admin)
             if(!data.botIsAdmin) return data.reply(mess.botAdmin)
-            if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix}${data.command} [ @tag ]*\nContoh : ${data.prefix}${data.command} @0`)
+            if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix + data.command} [ @tag ]*\nContoh : ${data.prefix + data.command} @0`)
             client.groupDemoteAdmin(data.from, data.mentionedJidList).then(() => data.reply(`Perintah diterima, menghapus admin @${data.mentionedJidList.join(' @').replace(/@s.whatsapp.net/g, '')}`)).catch(() => data.reply('Gagal!'))
         })
         Client.cmd.on('kick', async (data) => {
@@ -1136,7 +1244,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             if(!data.isGroup) return data.reply(mess.group)
             if(!data.isAdmin) return data.reply(mess.admin)
             if(!data.botIsAdmin) return data.reply(mess.botAdmin)
-            if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix}${data.command} [ @tag ]*\nContoh : ${data.prefix}${data.command} @0`)
+            if(data.mentionedJidList.length == 0) return data.reply(`Kirim perintah *${data.prefix + data.command} [ @tag ]*\nContoh : ${data.prefix + data.command} @0`)
             client.groupRemove(data.from, data.mentionedJidList).then(() => data.reply(`Berhasil mengeluarkan @${data.mentionedJidList.join(' @').replace(/@s.whatsapp.net/g, '')}`)).catch(() => data.reply('Gagal!'))
         })
         Client.cmd.on('add', async (data) => {
@@ -1144,7 +1252,7 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
             if(!data.isGroup) return data.reply(mess.group)
             if(!data.isAdmin) return data.reply(mess.admin)
             if(!data.botIsAdmin) return data.reply(mess.botAdmin)
-            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ nomor ]*\nContoh : ${data.prefix}${data.command} 6285736996646`)
+            if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ nomor ]*\nContoh : ${data.prefix + data.command} 6285736996646`)
             args = data.args.map(mp => mp + "@s.whatsapp.net")
             client.groupAdd(data.from, args).then(() => data.reply(`Berhasil menambahkan @${data.args.join(' @')}`)).catch(() => data.reply('Unable to invite'))
         })
@@ -1318,7 +1426,6 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
                 case 'help':
                 case 'list':
                 num = `${sender.split("@")[0]}@s.whatsapp.net`
-                let yo = client.user
 			const formater1 = (seconds) => {
                     const pad1 = (s) => {
                         return (s < 10 ? '0' : '') + s
@@ -1334,52 +1441,48 @@ _Untuk durasi lebih dari batas disajikan dalam bentuk link_`
 
 const time2 = moment().tz('Asia/Jakarta').format('HH:mm:ss')
 if(time2 < "23:59:00"){
-var ucapanWaktu = 'Selamat malam🌙'
+var ucapanWaktu = 'Good Evening'
                                         }
+if(time2 < "20:00:00"){
+var ucapanWaktu = 'Good afternoon'
+                                         }
 if(time2 < "18:00:00"){
-var ucapanWaktu = 'Selamat sore🌅'
+var ucapanWaktu = 'Good afternoon'
                                          }
 if(time2 < "15:00:00"){
-var ucapanWaktu = 'Selamat siang☀️'
+var ucapanWaktu = 'good afternoon'
                                          }
 if(time2 < "11:00:00"){
-var ucapanWaktu = 'Selamat pagi🌄'
+var ucapanWaktu = 'Good morning'
                                          }
 if(time2 < "03:30:00"){
-var ucapanWaktu = 'Selamat malam🌑'
+var ucapanWaktu = 'Good Evening'
 										}
 										
-ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
+ucapanSalam = `${ucapanWaktu} @${num.split("@")[0]} Have a nice day`
 
-                     const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')
+                     /*const mediaMsg = await client.prepareMessageMedia(await getBuffer(configs.imgUrl), 'imageMessage')*/
                      const buttonMessage = {
                            contentText: ucapanSalam + menu(data.prefix, data.pushname),
-                           footerText: `
-*╭─────「 BOT STAT 」──────*
-*├Device :* ${yo.phone.device_manufacturer}
-*├Model :* ${yo.phone.device_model}
-*├WA Ver :* ${yo.phone.wa_version}
-*├MCC :* ${yo.phone.mcc}
-*├MNC :* ${yo.phone.mnc}
-*├OS :* ${yo.phone.os_version}
-*├Platform :* ${os.platform()}
-*├Version :* ${os.version}
-*├Host :* ${os.hostname()}
-*├Runtime :* ${formater1(uptime1)}
-*├Speed :* ${latensip.toFixed(4)}ms
-*├RAM :* ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${Math.round(require('os').totalmem / 1024 / 1024)}MB
-*└────────────────────*`,
+                           footerText: `JANGAN LUPA BACA SnK!`,
                                 "contextInfo": {
-									  mentionedJid: [configs.ownerList[1]],
+									  mentionedJid: [sender, configs.ownerList[1]],
                                       participant: sender,
                                       stanzaId: message.key.id,
                                       quotedMessage: message.message,
                                      },
                                      buttons: [
                                      {
-                                       buttonId: `${data.prefix}ping`,
+                                       buttonId: `${data.prefix}snk`,
                                        buttonText: {
-                                          displayText: "𝐒𝐏𝐄𝐄𝐃"
+                                          displayText: "𝐒𝐧𝐊"
+                                        },
+                                         "type": "RESPONSE"
+                                     },
+                                     {
+                                       buttonId: `${data.prefix}info`,
+                                       buttonText: {
+                                          displayText: "𝐈𝐍𝐅𝐎"
                                         },
                                          "type": "RESPONSE"
                                      },
@@ -1391,18 +1494,30 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                                          "type": "RESPONSE"
                                      },
                                         ],
-                                         headerType: 4,
-                                     ...mediaMsg 
+                                         headerType: 1 // 4 for Image, 5 for video, 6 for location
+                                     /*...mediaMsg*/
                                      }
                     let zz = await client.prepareMessageFromContent(from, {buttonsMessage: buttonMessage}, {})
                 	client.relayWAMessage(zz, {waitForAck: true})
                     break
                     /*VVIBU*/
+                case 'pixivv':
+                try {
+					const pixivImg = require('pixiv-img');
+					const imgUrl = 'https://www.pixiv.net/en/artworks/92297955';
+
+					pixivImg(imgUrl).then(output => {
+						Client.sendFileFromUrl(from, output, 'p.jpg', mess.succes, data.message)
+					})
+					} catch (e) {
+							console.log(e)
+						}
+				break
                 case 'swanime':
 			try {
                 if(isLimit(data.sender)) return data.reply(mess.limit)
                 data.reply(mess.wait) //https://dapuhy-api.herokuapp.com/api/anime/storyanime?apikey=YOUR_APIKEY
-                Client.sendFileFromUrl(data.from, `${configs.DapUrl}/api/anime/storyanime?apikey=${configs.DapKey}`, 'video.mp4', `${mess.succes} @${data.sender.split('@')[0]}`, data.message)
+                Client.sendFileFromUrl(from, `${configs.DapUrl}/api/anime/storyanime?apikey=${configs.DapKey}`, 'video.mp4', `${mess.succes} @${data.sender.split('@')[0]}`, data.message)
             } catch (e) {
                 data.reply(mess.error2)
             }
@@ -1493,7 +1608,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 					case 'nekopoi':
                     try {
                         if(isLimit(data.sender)) return data.reply(mess.limit)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ query ]*\nContoh : ${data.prefix}${data.command} chainsawman`)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ query ]*\nContoh : ${data.prefix + data.command} chainsawman`)
                         data.reply(mess.wait) //https://api.lolhuman.xyz/api/nekopoisearch?apikey=APIKEY&query=isekai%20harem
                         res = await axios.get(`${configs.lolUrl}/api/nekopoisearch?apikey=${configs.LolKey}&query=${data.body}`)
                         ttt = res.data.result
@@ -1509,9 +1624,9 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 					case 'doudesu':
                     try {
                         if(isLimit(data.sender)) return data.reply(mess.limit)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ query ]*\nContoh : ${data.prefix}${data.command} chainsawman`)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ query ]*\nContoh : ${data.prefix + data.command} chainsawman`)
                         data.reply(mess.wait) //https://api.lolhuman.xyz/api/doujindesu?apikey=APIKEYLU&url=https://doujindesu.info/2021/01/18/queen-bee-chapter-33/
-                        res = await axios.get(`${configs.lolUrl}/api/nekopoisearch?apikey=${configs.LolKey}&url=${data.body}`)
+                        res = await axios.get(`${configs.lolUrl}/api/doujindesh?apikey=${configs.LolKey}&url=${data.body}`)
                         var ttt = res.data.result
                         tekss = `*Title :* ${ttt.title}\n`
                         tekss += `*Link Download :* ${ttt.link_dl}\n`
@@ -1524,7 +1639,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 					case 'nhsearch':
                     try {
                         if(isLimit(data.sender)) return data.reply(mess.limit)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ query ]*\nContoh : ${data.prefix}${data.command} chainsawman`)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ query ]*\nContoh : ${data.prefix + data.command} chainsawman`)
                         data.reply(mess.wait) //https://api.lolhuman.xyz/api/nhentaisearch?apikey=Apikey_Lu&query=gotoubun
                         res = await axios.get(`${configs.lolUrl}/api/nhentaisearch?apikey=${configs.LolKey}&query=${data.body}`)
                         ttt = res.data.result
@@ -1541,7 +1656,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 					case 'nh':
 					try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ code ]*\nContoh : ${data.prefix}${data.command} 344654`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ code ]*\nContoh : ${data.prefix + data.command} 344654`)
                         data.reply(mess.wait) //https://api.lolhuman.xyz/api/nhentai/344654?apikey=apiikey
                         axios.get(`${configs.lolUrl}/api/nhentai/${data.body}?apikey=${configs.LolKey}`)
   	              .then(({data}) => {
@@ -1560,8 +1675,8 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                     ini_txt += `Uploaded : ${info.uploaded}\n`
                     Client.sendFileFromUrl(from, image[0], 'nhentai.pdf', ini_txt, message)
                     })
-                    } catch(e) {
-                        data.reply(`Maaf pencarian ${data.body} tidak ditemukan`)
+                    } catch {
+                        data.reply(mess.error)
                     }
                         break
                     case 'nhentaipdf':
@@ -1569,26 +1684,23 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                     try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     if(!isPrem(data.sender)) return data.reply(mess.prem)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ 143756 ]*\nContoh : ${data.prefix}${data.command} 143756`)
-                        data.reply(mess.wait) //https://api.lolhuman.xyz/api/nhentaipdf/344253?apikey=beta
-                        res = await axios.get(`${configs.lolUrl}/api/nhentaipdf/${data.body}?apikey=${configs.LolKey}`)
-                        if(res.data.status == false) return data.reply(mess.error2)
-                        pedef = res.data.result
-                        Client.sendFileFromUrl(from, pedef, `${data.body}.pdf`, message)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ 143756 ]*\nContoh : ${data.prefix + data.command} 143756`)
+                        pedef = await axios.get(`https://pdf.lolhuman.xyz/download/${data.body}.pdf`)
+                        Client.sendFileFromUrl(from, pedef, `${data.body}.pdf`, mess.succes, message)
                         } catch(e) {
-                        data.reply(`Maaf pencarian ${data.body} tidak ditemukan`)
+                        data.reply(e)
                     	}
                         break
 					case 'nhentaipdf2':
 					case 'nhpdf2':
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ 143756 ]*\nContoh : ${data.prefix}${data.command} 143756`)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ 143756 ]*\nContoh : ${data.prefix + data.command} 143756`)
                         data.reply(`https://cin.cin.pw/v/${data.body}`)
                         break
                     case 'kusonime':
                     try {
                     	if(isLimit(data.sender)) return data.reply(mess.limit)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ judul ]*\nContoh : ${data.prefix}${data.command} anime attack on titan`)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ judul ]*\nContoh : ${data.prefix + data.command} anime attack on titan`)
                         data.reply(mess.wait)
         	        axios.get(`${configs.lolUrl}/api/kusonimesearch?apikey=${configs.LolKey}&query=${data.body}`)
   	              .then(({data}) => {
@@ -1614,13 +1726,13 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
   	              let caption = `*「Kusonime Search」*\n\n` + ini_txt
        	         Client.sendFileFromUrl(from, thumbnail, 'p.jpg', caption, message)
  	               })
-					} catch(e) {
-                        data.reply(`Maaf pencarian ${data.body} tidak ditemukan`)
+					} catch {
+                        data.reply(mess.error + `\n atau mungkin pencarian ${data.body} tidak ditemukan`)
                     }
   	              break
 					case 'anime':
                     	if(isLimit(data.sender)) return data.reply(mess.limit)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ judul ]*\nContoh : ${data.prefix}${data.command} anime attack on titan`)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ judul ]*\nContoh : ${data.prefix + data.command} yosuga no sora`)
                         data.reply(mess.wait) //https://api.lolhuman.xyz/api/anime?apikey=Apikey_Lu&query=gotoubun%20no%20hanayome
         	        axios.get(`${configs.lolUrl}/api/anime?apikey=${configs.LolKey}&query=${data.body}`)
   	              .then(({data}) => {
@@ -1656,8 +1768,34 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                     for (var x of ini_character) {
                         ini_txt += `- ${x.name.full} (${x.name.native})\n`
                     }
-  	              let caption = `*「MAL Search」*\n\n` + ini_txt
+  	              let caption = `*「Anime Search | MAL」*\n\n` + ini_txt
        	         Client.sendFileFromUrl(from, coverImage.large, 'p.jpg', caption, message)
+ 	               })
+  	              break
+					case 'chara':
+                    	if(isLimit(data.sender)) return data.reply(mess.limit)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ judul ]*\nContoh : ${data.prefix + data.command} sora`)
+                        data.reply(mess.wait) //https://api.lolhuman.xyz/api/character?apikey=Apikey_Lu&query=gotoubun%20no%20hanayome
+        	        axios.get(`${configs.lolUrl}/api/character?apikey=${configs.LolKey}&query=${data.body}`)
+  	              .then(({data}) => {
+     	           let { id, name, image, description, favourites, media } = data.result
+    				ini_txt = `*Id :* ${id}\n`
+					ini_txt += `*Name :*`
+					for (var x in name) {
+                        ini_txt += `\n${x}\n`
+                        	for (var y in name[x]) {
+                        	ini_txt += `${name[x][y]}`
+                        	}
+                        }
+					ini_txt += `\n*Description :* \n${description}\n`
+					ini_txt += `*Favourites :* ${favourites}\n`
+					ini_txt += `*Media :*\n`
+                    ini_media = media.nodes
+                    for (var x of ini_media) {
+                        ini_txt += `- ${x.ini_media}\n`
+                    }
+  	              let caption = `*「Character Search」*\n\n` + ini_txt
+       	         Client.sendFileFromUrl(from, image.large, 'p.jpg', caption, message)
  	               })
   	              break
 					case 'ppcouple':
@@ -1963,7 +2101,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                                 {
                                  buttonId: `${data.prefix + data.command}`,
                                  buttonText: {
-                                    displayText: `🔍𝐒𝐄𝐀𝐑𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
+                                    displayText: `🔍𝐒𝐄𝐀??𝐂𝐇 𝐇𝐄𝐍𝐓𝐀𝐈`
                                   },
                                   "type": "RESPONSE"
                                 },
@@ -2217,14 +2355,14 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                     if(type != 'videoMessage' && !isQuotedVideo) return data.reply('Wrong format!')
 					const getbuffz = data.isQuotedVideo ? JSON.parse(JSON.stringify(message).replace('quotedM','m')).message.extendedTextMessage.contextInfo : data.message	
 				    const dlfilez = await client.downloadMediaMessage(getbuffz)
-                    convertMp3(dlfilez).then(data =>Client.sendFileFromUrl(from, data, 'p.mp3', '', message)).catch(er => Client.reply(from, 'Unexpected error!', message))
+                    convertMp3(dlfilez).then(data =>Client.sendFileFromUrl(from, data, 'p.mp3', '', message)) /*.catch(er => Client.reply(from, 'Unexpected error!', message))*/
 					break
                 case 'stikerwm':
                 case 'stickerwm':
                 case 'swm':
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     if(type != 'videoMessage' && !isQuotedVideo && !isQuotedImage && type != 'imageMessage') return data.reply('Wrong format!')
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ pack|author ]*\nContoh : ${data.prefix}${data.command} punya|Pawachan`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ pack|author ]*\nContoh : ${data.prefix + data.command} punya|Pawachan`)
                     data.reply(mess.wait)
                     const getbuffs = data.isQuotedVideo || data.isQuotedImage ? JSON.parse(JSON.stringify(data.message).replace('quotedM', 'm')).message.extendedTextMessage.contextInfo : data.message
                     const dlfiles = await client.downloadMediaMessage(getbuffs)
@@ -2237,7 +2375,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                 case 'semoji':
                     try {
                         if(isLimit(data.sender)) return data.reply(mess.limit)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ emoji ]*\nContoh : ${data.prefix}${data.command} 😃`)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ emoji ]*\nContoh : ${data.prefix + data.command} 😃`)
                         Client.sendStickerFromUrl(from, `${configs.apiUrl}/api/emoji-image?apikey=${configs.zeksKey}&emoji=${encodeURIComponent(data.body)}`, message, { pack: `${configs.pack}`, author: `${configs.author}` })
                     } catch {
                         data.reply(mess.error)
@@ -2247,7 +2385,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                 case 'takestik':
                     if(isLimit(data.sender)) return data.reply(mess.limit)
                     if(!data.isQuotedSticker) return data.reply('Reply sticker!')
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ pack|author ]*\nContoh : ${data.prefix}${data.command} punya|Pawachan`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ pack|author ]*\nContoh : ${data.prefix + data.command} punya|Pawachan`)
                     data.reply(mess.wait)
                     p = data.body
                     text = p.split('|')
@@ -2319,7 +2457,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 				case 'tololserti':
                     try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} Khael`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} Khael`)
                     data.reply(mess.wait) //https://api.lolhuman.xyz/api/toloserti?apikey=Apikey&name=Test
                     Client.sendFileFromUrl(from, `${configs.lolUrl}/api/toloserti?apikey=${configs.LolKey}&name=${data.body}`, 'gambar.jpg', mess.succes, message)
                     } catch {
@@ -2330,7 +2468,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 				case 'tololserti':
                     try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} Khael`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} Khael`)
                     data.reply(mess.wait) //https://api.lolhuman.xyz/api/toloserti?apikey=Apikey&name=Test
                     Client.sendFileFromUrl(from, `${configs.lolUrl}/api/toloserti?apikey=${configs.LolKey}&name=${data.body}`, 'gambar.jpg', mess.succes, message)
                     } catch {
@@ -2340,7 +2478,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 				case 'fuckboyserti':
                     try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} Khael`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} Khael`)
                     data.reply(mess.wait) //https://api.lolhuman.xyz/api/fuckboy?apikey=beta&name=Test
                     Client.sendFileFromUrl(from, `${configs.lolUrl}/api/fuckboy?apikey=${configs.LolKey}&name=${data.body}`, 'gambar.jpg', mess.succes, message)
                     } catch {
@@ -2350,7 +2488,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 				case 'fuckgirlserti':
                     try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} Khael`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} Khael`)
                     data.reply(mess.wait) //https://api.lolhuman.xyz/api/fuckgirl?apikey=beta&name=Test
                     Client.sendFileFromUrl(from, `${configs.lolUrl}/api/fuckgirl?apikey=${configs.LolKey}&name=${data.body}`, 'gambar.jpg', mess.succes, message)
                     } catch {
@@ -2360,7 +2498,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 				case 'bucinserti':
                     try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} Khael`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} Khael`)
                     data.reply(mess.wait) //https://api.lolhuman.xyz/api/bucinserti?apikey=beta&name=Test
                     Client.sendFileFromUrl(from, `${configs.lolUrl}/api/bucinserti?apikey=${configs.LolKey}&name=${data.body}`, 'gambar.jpg', mess.succes, message)
                     } catch {
@@ -2370,7 +2508,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 				case 'pacarserti':
                     try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} shiro`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} shiro`)
                     data.reply(mess.wait) //https://api.lolhuman.xyz/api/pacarserti?apikey=beta&name=Test
                     Client.sendFileFromUrl(from, `${configs.lolUrl}/api/pacarserti?apikey=${configs.LolKey}&name=${data.body}`, 'gambar.jpg', mess.succes, message)
                     } catch {
@@ -2380,7 +2518,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 				case 'goodboyserti':
                     try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} shiro`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} shiro`)
                     data.reply(mess.wait) //https://api.lolhuman.xyz/api/goodboy?apikey=beta&name=Test
                     Client.sendFileFromUrl(from, `${configs.lolUrl}/api/goodboy?apikey=${configs.LolKey}&name=${data.body}`, 'gambar.jpg', mess.succes, message)
                     } catch {
@@ -2390,7 +2528,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 				case 'goodgirlserti':
                     try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} shiro`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} shiro`)
                     data.reply(mess.wait) //https://api.lolhuman.xyz/api/goodgirl?apikey=beta&name=Test
                     Client.sendFileFromUrl(from, `${configs.lolUrl}/api/goodgirl?apikey=${configs.LolKey}&name=${data.body}`, 'gambar.jpg', mess.succes, message)
                     } catch {
@@ -2400,7 +2538,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 				case 'badboyserti':
                     try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} shiro`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} shiro`)
                     data.reply(mess.wait) //https://api.lolhuman.xyz/api/goodboy?apikey=beta&name=Test
                     Client.sendFileFromUrl(from, `${configs.lolUrl}/api/badboy?apikey=${configs.LolKey}&name=${data.body}`, 'gambar.jpg', mess.succes, message)
                     } catch {
@@ -2410,7 +2548,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 				case 'badgirlserti':
                     try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} shiro`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} shiro`)
                     data.reply(mess.wait) //https://api.lolhuman.xyz/api/goodboy?apikey=beta&name=Test
                     Client.sendFileFromUrl(from, `${configs.lolUrl}/api/badgirl?apikey=${configs.LolKey}&name=${data.body}`, 'gambar.jpg', mess.succes, message)
                     } catch {
@@ -2448,7 +2586,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                 case 'nulis':
                     try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} Khael`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} Khael`)
                     data.reply(mess.wait)
                     Client.sendFileFromUrl(from, `${configs.apiUrl}/api/${command}?text=${data.body}&apikey=${configs.zeksKey}`, 'gambar.jpg', mess.succes, message)
                     } catch {
@@ -2465,7 +2603,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                 case 'watercolour':
                     try {
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks1|teks2 ]*\nContoh : ${data.prefix}${data.command} Khael|Pawachan`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks1|teks2 ]*\nContoh : ${data.prefix + data.command} Khael|Pawachan`)
                     data.reply(mess.wait)
                     p = data.body
                     text = p.split('|')
@@ -2478,7 +2616,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                 case 'harta':
                 case 'hartatahta':
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} Khael`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} Khael`)
                     data.reply(mess.wait)
                     Client.sendFileFromUrl(from, `${configs.apiUrl}/api/hartatahta?text=${data.body}&apikey=${configs.zeksKey}`, 'harta.jpg', mess.succes, message)
                     Client.sendStickerFromUrl(from, `${configs.apiUrl}/api/hartatahta?text=${data.body}&apikey=${configs.zeksKey}`, message, {
@@ -2523,7 +2661,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                 case 'wiki':
                     try {
                         if(isLimit(data.sender)) return data.reply(mess.limit)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ query ]*\nContoh : ${data.prefix}${data.command} manusia`)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ query ]*\nContoh : ${data.prefix + data.command} manusia`)
                         data.reply(mess.wait)
                         res = await axios.get(`${configs.apiUrl}/api/wiki?apikey=${configs.zeksKey}&q=${data.body}`)
                         te = `*Hasil pencarian dari* : ${data.body}\n\n*Result* : ${res.data.result.result}`
@@ -2596,14 +2734,14 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                     try {
                         if(isLimit(data.sender)) return data.reply(mess.limit)
                         if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}ytsearch [ query ]*\nContoh : ${data.prefix}ytsearch jessnolimit`)
-                        data.reply(mess.wait)
-                        res = await axios.get(`${configs.apiUrl}/api/yts?apikey=${configs.zeksKey}&q=${data.body}`)
+                        data.reply(mess.wait) //https://api.lolhuman.xyz/api/ytsearch?apikey=beta&query=melukis%20senja
+                        res = await axios.get(`${configs.lolUrl}/api/ytsearch?apikey=${configs.LolKey}&query=${data.body}`)
                         ttt = res.data.result
                         var teks = `*「 YOUTUBE 」*\n\n*Hasil Pencarian : ${data.body}*\n\n`
                         for(let i = 0; i < ttt.length; i++) {
-                            teks += `*Title* : ${ttt[i].video.title}\n*Durasi*: ${ttt[i].video.duration}\n*Upload* : ${ttt[i].video.upload_date}\n*View*: ${ttt[i].video.views}\n*Channel*: ${ttt[i].uploader.username}\n*Link*: ${ttt[i].video.url}\n\n`
+                            teks += `*Title :* ${ttt[i].title}\n*ID :* ${ttt[i].videoId}\n*Upload :* ${ttt[i].published}\n*View :* ${ttt[i].views}\n*Thumbnail :* ${ttt[i].thumbnail}\n*Link*: https://youtu.be/${ttt[i].videoId}\n\n`
                         }
-                        await Client.sendFileFromUrl(from, ttt[0].video.thumbnail_antidel, 'axis.jpg', teks, message)
+                        await Client.sendFileFromUrl(from, ttt[0].thumbnail, 'axis.jpg', teks, message)
                     } catch(e) {
                         data.reply(`Maaf pencarian ${data.body} tidak ditemukan`)
                     }
@@ -2797,7 +2935,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                 case 'ramalpasangan':
                 case 'pasangan':
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ kamu|dia ]*\nContoh : ${data.prefix}${data.command} Khael|Pawachan`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ kamu|dia ]*\nContoh : ${data.prefix + data.command} Khael|Pawachan`)
                     data.reply(mess.wait)
                     p = data.body
                     text = p.split('|')
@@ -2826,7 +2964,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                     /*OTHER*/
                 case 'shortlink':
                 	if(isLimit(data.sender)) return data.reply(mess.limit)
-					if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command}[ link ]*\nContoh : ${data.prefix}${data.command} https://nhentai.net/`)
+					if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command}[ link ]*\nContoh : ${data.prefix + data.command} https://nhentai.net/`)
 					data.reply(mess.wait) //https://api.zeks.xyz/api/urlshort-all?apikey=apivinz&url=https://api.zeks.xyz
 					res = await axios.get(`${configs.apiUrl}/api/urlshort-all?apikey=${configs.zeksKey}&url=${data.body}`)
 					if(res.data.status == false) return data.reply(res.data.message)
@@ -2839,7 +2977,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                 case 'ouo':
                     try {
                         if(isLimit(data.sender)) return data.reply(mess.limit)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ link ]*\nContoh : ${data.prefix}${data.command} https://ouo.io/8BgQ1w`)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ link ]*\nContoh : ${data.prefix + data.command} https://ouo.io/8BgQ1w`)
                         data.reply(mess.wait) //
                         res = await axios.get(`${configs.lolUrl}/api/ouo?apikey=${configs.LolKey}&url=${data.body}`)
                         te = `*[ ByPass ouo ]*\n\n*Results :* ${res.data.result}`
@@ -2851,7 +2989,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 				case 'mirrored':
                     try {
                         if(isLimit(data.sender)) return data.reply(mess.limit)
-                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ link ]*\nContoh : ${data.prefix}${data.command} https://www.mirrored.to/files/EB7BOJU3/[NekoPoi]_Isekai_Harem_Monogatari_-_04_[720P][nekopoi.care].mp4_links`)
+                        if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ link ]*\nContoh : ${data.prefix + data.command} https://www.mirrored.to/files/EB7BOJU3/[NekoPoi]_Isekai_Harem_Monogatari_-_04_[720P][nekopoi.care].mp4_links`)
                         data.reply(mess.wait) //https://api.lolhuman.xyz/api/mirrorcreator?apikey=pee&url=https://www.mirrored.to/files/EB7BOJU3/[NekoPoi]_Isekai_Harem_Monogatari_-_04_[720P][nekopoi.care].mp4_links
                         res = await axios.get(`${configs.lolUrl}/api/mirrorcreator?apikey=${configs.LolKey}&url=${data.body}`)
                         te = `*[ ByPass Mirrored ]*\n`
@@ -2868,7 +3006,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                     break
                 case 'spamsms':
                 	if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if (data.body == "") return data.reply(`Contoh: ${data.prefix}${data.command} 62822xxxxxxxx`)
+                    if (data.body == "") return data.reply(`Contoh: ${data.prefix + data.command} 62822xxxxxxxx`)
                     if (data.body == "6282248192917") return data.reply(`Lu Mau di Banned?`)
                     if (data.body == "+62 822-4819-2917") return data.reply(`Lu Mau di Banned?`)
                     if (data.body == "628114811363") return data.reply(`Jangan Ke no. bot, lu mau di banned?`)
@@ -2927,7 +3065,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                 case 'ssweb':
 				    try{
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ link ]*\nContoh : ${data.prefix}${data.command} https://beacons.page/khaelsan`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ link ]*\nContoh : ${data.prefix + data.command} https://beacons.page/khaelsan`)
                     data.reply(mess.wait)
                     Client.sendFileFromUrl(from, `${configs.lolUrl}/api/sswebfull?apikey=${configs.LolKey}&url=${data.body}`, 'gambar.jpg', mess.succes, message)
                     } catch {
@@ -2937,7 +3075,7 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 				case 'ssweb2':
 				    try{
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ link ]*\nContoh : ${data.prefix}${data.command} https://beacons.page/khaelsan`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ link ]*\nContoh : ${data.prefix + data.command} https://beacons.page/khaelsan`)
                     data.reply(mess.wait) // https://dapuhy-api.herokuapp.com/api/others/ssweb?url=https://dapuhy-api.herokuapp.com&apikey=DappaGG
                     Client.sendFileFromUrl(from, `${configs.dapUrl}/api/others/ssweb?url=${data.body}&apikey=${configs.DapKey}`, `ssweb.jpg`, mess.succes, message)
                     } catch {
@@ -2948,18 +3086,26 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                 case 'jadwalsholat':
                 case 'jadwalshalat':
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} jakarta`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} jakarta`)
                     data.reply(mess.wait)
                     res = await axios.get(`${configs.apiUrl}/api/jadwalsholat?apikey=${configs.zeksKey}&daerah=${data.body}`)
                     data.reply(res.data.data.string)
                     break
                 case 'jadwaltv':
                     if(isLimit(data.sender)) return data.reply(mess.limit)
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks ]*\nContoh : ${data.prefix}${data.command} antv`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks ]*\nContoh : ${data.prefix + data.command} antv`)
                     data.reply(mess.wait)
                     res = await axios.get(`${configs.apiUrl}/api/jadwaltv?apikey=${configs.zeksKey}&channel=${data.body}`)
                     data.reply(res.data.result)
                     break
+				case 'report':
+					if (data.body == "") return data.reply(`What to report?`)
+					num = `${sender.split("@")[0]}@s.whatsapp.net`
+					const pesan = data.body
+					const teks1 = `*REPORT*\n\nFrom : @${num.split("@")[0]}\nPesan : ${pesan}`
+					Client.sendText(`6282248192917@s.whatsapp.net`, teks1, message)
+					data.reply(mess.succes + `\n_The report has been submitted to the owner, Report fake akan diberi sanksi soft block!_`)
+					break
                     /*GROUP*/
                     /*
                 case 'antidelete':
@@ -3103,44 +3249,11 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
 					if (stdout) return data.reply(stdout)
 					})
 				    break
-				/*sewa*/
-				case 'sewa':
-              if (!data.isOwner)return data.reply(mess.group)
-              if (!data.isOwner) return data.reply(mess.ownerOnly)
-              if (data.args.length < 1) return data.reply(`Example: *${data.prefix}sewa* add/del waktu`)
-              if (data.args[0].toLowerCase() === 'add'){
-				_sewa.addSewaGroup(from, args[1], sewa)
-              data.reply(`Successfully Hiring Bot In This Group\nSilaahkan ketik ${data.prefix}ceksewa`)
-              } else if (data.args[0].toLowerCase() === 'del'){
-              sewa.splice(_sewa.getSewaPosition(from, sewa), 1)
-              fs.writeFileSync('./lib/json/sewa.json', JSON.stringify(sewa))
-              data.reply(mess.succes)
-              } else {
-              data.reply(`Example: ${data.prefix}sewa add/del waktu`)
-				}
-              break
-  		     case 'sewalist': case 'listsewa':
-              txtnyee = `List Sewa\nJumlah : ${sewa.length}\n\n`
-              for (let i of sewa){
-              cekvipp = ms(i.expired - Date.now())
-              txtnyee += `*ID :* ${i.id} \n*Expire :* ${cekvipp.days} day(s) ${cekvipp.hours} hour(s) ${cekvipp.minutes} minute(s) ${cekvipp.seconds} second(s)\n\n`
-				}
-              data.reply(txtnyee)
-              break
-       case 'sewacheck': case 'ceksewa': 
-       const isSewa = _sewa.checkSewaGroup(from, sewa)
-              if (!data.isGroup) return data.reply(mess.group)
-              if (!isSewa) return data.reply(`Group ini tidak terdaftar dalam list sewabot.`)
-              cekvip = ms(_sewa.getSewaExpired(from, sewa) - Date.now())
-              premiumnya = `*「 SEWA EXPIRE 」*\n\n➸ *ID*: ${from}\n➸ *Expired :* ${cekvip.days} day(s) ${cekvip.hours} hour(s) ${cekvip.minutes} minute(s)`
-              data.reply(premiumnya)
-              break
-				/*dll*/
-                case 'getquoted':
+				case 'getquoted':
                     data.reply(JSON.stringify(message.message.extendedTextMessage.contextInfo, null, 3))
                     break
 				case 'readmore':
-                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix}${data.command} [ teks|Teks ]*\nContoh : ${data.prefix}${data.command} beb|an`)
+                    if(data.body == "") return data.reply(`Kirim perintah *${data.prefix + data.command} [ teks|Teks ]*\nContoh : ${data.prefix + data.command} beb|an`)
                     const more = String.fromCharCode(8206)
 			    	const readmore = more.repeat(4001)
                     p = data.body
@@ -3158,11 +3271,62 @@ ucapanSalam = `${ucapanWaktu} ${data.pushname}, Semoga harimu menyenangkan`
                             Client.sendFileFromBase64(from, bf.data.result, 'to.gif', 'nih', message)
 			})
                     } else {
-                        axios(`https://serv-api.zeks.xyz/sticker/png`, { method: "post", headers: { "content-type": 'application/json' }, data: { base64: mtdt.toString('base64')}}).then(bf => {
+                        axios(`https://api.zeks.me/sticker/png`, { method: "post", headers: { "content-type": 'application/json' }, data: { base64: mtdt.toString('base64')}}).then(bf => {
                             Client.sendFileFromBase64(from, bf.data.result, 'to.png', 'nih', message)
                         })
                     }
                     break
+				/*sewa*/
+				case 'sewa':
+              if (!data.isGroup) return data.reply(mess.group)
+              if (!data.isOwner) return data.reply(mess.ownerOnly)
+              if (data.args.length < 1) return data.reply(`Example: *${data.prefix}sewa* add/del waktu`)
+              if (data.args[0].toLowerCase() === 'add'){
+				_sewa.addSewaGroup(from, args[1], sewa)
+              data.reply(`Successfully Hiring Bot In This Group\nSilaahkan ketik ${data.prefix}ceksewa`)
+              } else if (data.args[0].toLowerCase() === 'del'){
+              sewa.splice(_sewa.getSewaPosition(from, sewa), 1)
+              fs.writeFileSync('./lib/json/sewa.json', JSON.stringify(sewa))
+              data.reply(mess.succes)
+              } else {
+              data.reply(`Example: ${data.prefix}sewa add/del waktu`)
+				}
+              break
+				case 'sewalist':
+				case 'listsewa':
+              txtnyee = `List Sewa\nJumlah : ${sewa.length}\n\n`
+              for (let i of sewa){
+              cekvipp = ms(i.expired - Date.now())
+              txtnyee += `*ID :* ${i.id} \n*Expire :* ${cekvipp.days} day(s) ${cekvipp.hours} hour(s) ${cekvipp.minutes} minute(s) ${cekvipp.seconds} second(s)\n\n`
+				}
+              data.reply(txtnyee)
+              break
+				case 'sewacheck':
+				case 'ceksewa': 
+			  const isSewa = _sewa.checkSewaGroup(from, sewa)
+              if (!data.isGroup) return data.reply(mess.group)
+              if (!isSewa) return data.reply(`Group ini tidak terdaftar dalam list sewabot.`)
+              cekvip = ms(_sewa.getSewaExpired(from, sewa) - Date.now())
+              premiumnya = `*「 SEWA EXPIRE 」*\n\n➸ *ID*: ${from}\n➸ *Expired :* ${cekvip.days} day(s) ${cekvip.hours} hour(s) ${cekvip.minutes} minute(s)`
+              data.reply(premiumnya)
+              break
+				/*nsfwMode*/
+				/*
+                case 'nsfw':
+				if(!isPrem(data.sender)) return data.reply(mess.prem)
+				if (data.args.length < 1) return data.reply(`Example: *${data.prefix}nsfw* on/off`)
+				if (data.args[0].toLowerCase() === 'on'){
+				fs.writeFileSync('./lib/json/nsfw.json', JSON.stringify(nsfw))
+				data.reply(mess.succes + `\nSukses menyalakan mode NSFW`)
+				} else if (data.args[0].toLowerCase() === 'off'){
+				nsfw.splice(from, 1)
+				fs.writeFileSync('./lib/json/nsfw.json', JSON.stringify(nsfw))
+				data.reply(mess.succes + `\nSukses mematikan mode NSFW`)
+				} else {
+				data.reply(`Example: *${data.prefix}nsfw* on/off`)
+				}
+				break
+				*/
             }
         })
         //Handler Sticker Command
@@ -3256,3 +3420,11 @@ function isPrem(sender) {
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+/*
+function isNsfw(from) {
+	const nsfw = JSON.parse(fs.readFileSync('./lib/json/nsfw.json'))
+	fs.writeFileSync('./lib/json/nsfw.json', JSON.stringify(nsfw))
+	return false
+}
+*/
