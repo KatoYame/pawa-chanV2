@@ -33,7 +33,7 @@ const starts = async (sesName) => {
     try {
         const Client = new ClientJs(global.configs, sesName || global.configs.defaultSessionName)
 		const client = Client.mainClient
-		client.version = [2, 2143, 3]
+		client.version = [2,2143,3]
 		require("./lib/http-server")(client)
         Client.starts()
 		detectChange('./handler.js', (mdl) =>{
